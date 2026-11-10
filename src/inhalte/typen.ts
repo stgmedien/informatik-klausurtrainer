@@ -45,6 +45,19 @@ export interface VorhersageLoesung {
   endet?: boolean;
 }
 
+export interface Testfall {
+  name: string;
+  welt: WeltAngabe;
+  /** Argumente für Methoden mit Parametern. */
+  args?: (number | boolean)[];
+  /** Beschreibt, welcher Grenzfall hier geprüft wird. */
+  grenzfall?: string;
+  /** Wird als Ausgangslage in der Aufgabe gezeigt (sonst nur bei der Auswertung). */
+  sichtbar?: boolean;
+}
+
+export type StrukturMerkmal = 'while' | 'do-while' | 'for' | 'if' | 'if-else' | 'hilfsmethode' | 'und' | 'oder' | 'nicht';
+
 export type Material =
   | { art: 'klassendiagramm'; modell: KlassenModell; titel?: string }
   | { art: 'welt'; welt: WeltAngabe; titel?: string }
@@ -108,6 +121,29 @@ export type Aufgabe = AufgabeBasis &
         erwartet: VorhersageLoesung;
         /** Erscheint nach der Abgabe neben dem Programmlauf. */
         erklaerung: string;
+        /** Was gezeigt wird: Quelltext (Standard) oder nur das Struktogramm. */
+        darstellung?: 'code' | 'struktogramm';
+      }
+    | {
+        typ: 'programmieren';
+        /** Startquelltext: Methodenkopf zum Ausfüllen oder fehlerhafter Code bei „Fehler finden“. */
+        vorlage: string;
+        /** Methode, die in den Testwelten aufgerufen wird. */
+        methode: string;
+        tests: Testfall[];
+        musterloesung: string;
+        /** Typische falsche Lösungen; verhält sich die Abgabe genauso, ist der Fehler bekannt. */
+        fehlvarianten?: { quelltext: string; muster: string; erklaerung: string }[];
+        struktur?: { muss?: StrukturMerkmal[]; verboten?: StrukturMerkmal[] };
+        /** Statt einer Beschreibung wird das Struktogramm der Musterlösung als Vorlage gezeigt. */
+        struktogrammZeigen?: boolean;
+      }
+    | {
+        typ: 'zeilen-ordnen';
+        /** Richtige Lösung, korrekt eingerückt (4 Leerzeichen je Stufe). */
+        loesung: string;
+        /** Zeilen, die nicht in die Lösung gehören. */
+        distraktoren?: string[];
       }
   );
 

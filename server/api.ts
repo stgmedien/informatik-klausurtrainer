@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { KiFehler, kiVerfuegbar, modell } from './ki/klient';
-import { gibHinweis, korrigiere } from './ki/rollen';
+import { diagnostiziere, gibHinweis, korrigiere } from './ki/rollen';
 import { leseStand, schreibeStand } from './stand';
 
 const MAX_BYTES = 5 * 1024 * 1024;
@@ -53,6 +53,7 @@ export async function behandle(req: IncomingMessage, res: ServerResponse): Promi
   }
   if (pfad === '/ki/korrektur' && methode === 'POST') return kiRoute(req, res, korrigiere);
   if (pfad === '/ki/tutor' && methode === 'POST') return kiRoute(req, res, gibHinweis);
+  if (pfad === '/ki/diagnose' && methode === 'POST') return kiRoute(req, res, diagnostiziere);
 
   return sende(res, 404, { fehler: `Unbekannte Route: ${methode} ${pfad}` });
 }

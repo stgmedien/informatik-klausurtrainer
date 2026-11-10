@@ -3,7 +3,7 @@ import { Fragment, type ReactNode } from 'react';
 // Kleiner Markdown-Darsteller für die Inhalte der App: Absätze, **fett**, *kursiv*, `Code`,
 // Listen, Tabellen und Codeblöcke. Bewusst ohne Abhängigkeit und ohne HTML-Durchreichung.
 
-function inline(text: string): ReactNode[] {
+export function inline(text: string): ReactNode[] {
   const teile = text.split(/(`[^`]+`|\*\*[^*]+\*\*|\*[^*\s][^*]*\*)/g);
   return teile.map((teil, i) => {
     if (teil.startsWith('`') && teil.endsWith('`') && teil.length > 2) return <code key={i}>{teil.slice(1, -1)}</code>;
@@ -117,4 +117,9 @@ export function Markdown({ text, klasse }: { text: string; klasse?: string }) {
     );
   }
   return <div className={`markdown ${klasse ?? ''}`}>{bloecke}</div>;
+}
+
+/** Text mit `Code`, **fett** und *kursiv*, ohne Absatz drumherum. */
+export function Inline({ text }: { text: string }) {
+  return <>{inline(text)}</>;
 }

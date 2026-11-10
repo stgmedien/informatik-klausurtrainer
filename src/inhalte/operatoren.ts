@@ -83,6 +83,18 @@ export const OPERATOREN: Operator[] = [
     erwartet: 'Lauffähigen Java-Quelltext schreiben: korrekte Syntax, Klammern, Semikolons, Einrückung.',
   },
   {
+    name: 'modifizieren',
+    definition: 'eine gegebene Struktur gemäß konkreter Vorgaben verändern',
+    afb: 'II',
+    erwartet: 'Das Gegebene gezielt ändern, sodass es die Vorgabe erfüllt – alles andere bleibt, wie es ist.',
+  },
+  {
+    name: 'vervollständigen',
+    definition: 'eine gegebene Struktur gemäß konkreter Vorgaben erweitern oder verändern',
+    afb: 'II',
+    erwartet: 'Die Lücken im Gegebenen so füllen, dass es die Vorgabe erfüllt.',
+  },
+  {
     name: 'erweitern',
     definition: 'eine gegebene Struktur gemäß konkreter Vorgaben ergänzen',
     afb: 'II',

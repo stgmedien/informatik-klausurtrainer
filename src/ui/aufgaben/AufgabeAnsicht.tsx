@@ -9,6 +9,8 @@ import { punkteText } from '../hilfen';
 import { frageTutor } from '../ki';
 import { useStand } from '../kontext';
 import { Freitext } from './Freitext';
+import { Programmieren } from './Programmieren';
+import { ZeilenOrdnen } from './ZeilenOrdnen';
 import { Vorhersage } from './Vorhersage';
 import { type Abgabe, Auswahl, Luecke, Reihenfolge, Zuordnen } from './einfach';
 import { AuswertungAufgabe, WahrheitstabelleAufgabe } from './logik';
@@ -43,6 +45,10 @@ function Koerper({ aufgabe, durchgang, fertig, onAbgabe, onEntwurf }: KoerperPro
       return <Freitext aufgabe={aufgabe} {...gemeinsam} />;
     case 'vorhersage':
       return <Vorhersage aufgabe={aufgabe} {...gemeinsam} />;
+    case 'programmieren':
+      return <Programmieren aufgabe={aufgabe} {...gemeinsam} />;
+    case 'zeilen-ordnen':
+      return <ZeilenOrdnen aufgabe={aufgabe} {...gemeinsam} />;
   }
 }
 
@@ -68,7 +74,7 @@ export function AufgabeAnsicht({ aufgabe, onWeiter, weiterText = 'Weiter', verbu
   const fertig = ergebnis !== null;
   const hinweise = stufen + tutorHinweise.length;
   // Der Tutor bezieht sich auf einen Entwurf; den gibt es bisher bei Freitextaufgaben.
-  const tutorMoeglich = ki.verfuegbar && aufgabe.typ === 'freitext';
+  const tutorMoeglich = ki.verfuegbar && (aufgabe.typ === 'freitext' || aufgabe.typ === 'programmieren');
 
   const tutor = async () => {
     setTutorLaedt(true);
@@ -104,6 +110,7 @@ export function AufgabeAnsicht({ aufgabe, onWeiter, weiterText = 'Weiter', verbu
         quelle: a.quelle,
         hinweise,
         klausurnah: Boolean(aufgabe.klausurnah),
+        ...(a.muster?.length ? { muster: a.muster } : {}),
       }),
     );
   };

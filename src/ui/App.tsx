@@ -9,12 +9,14 @@ import { EinheitSpieler, Heute, Wiederholung } from './seiten/Heute';
 import { Kannliste, Ueben } from './seiten/Lernen';
 import { Einstellungen, Spickzettel } from './seiten/Rest';
 import { Werkstatt } from './seiten/Werkstatt';
+import { Fehlerheft } from './seiten/Fehlerheft';
 
 const NAVIGATION: { ansicht: Ansicht; titel: string }[] = [
   { ansicht: { seite: 'heute' }, titel: 'Heute' },
   { ansicht: { seite: 'kann' }, titel: 'Kann-Liste' },
   { ansicht: { seite: 'ueben' }, titel: 'Üben' },
   { ansicht: { seite: 'werkstatt' }, titel: 'Werkstatt' },
+  { ansicht: { seite: 'fehlerheft' }, titel: 'Fehlerheft' },
   { ansicht: { seite: 'spick' }, titel: 'Spickzettel' },
   { ansicht: { seite: 'einstellungen' }, titel: 'Einstellungen' },
 ];
@@ -102,6 +104,9 @@ export function App() {
     }
     case 'werkstatt':
       inhalt = <Werkstatt />;
+      break;
+    case 'fehlerheft':
+      inhalt = <Fehlerheft geheZu={geheZu} />;
       break;
     case 'spick':
       inhalt = <Spickzettel />;

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { EINHEITEN, KANNLISTE, aufgabe, kannItem, lektion } from '../../inhalte';
 import type { Einheit } from '../../inhalte/typen';
+import { faelligeFehler } from '../../lernen/fehlerheft';
 import { aufgabenIdsDerEinheit, aufwaermAufgaben, einheitMinuten, faelligeKann, istVerfuegbar, naechsteEinheit, zaehleGrade } from '../../lernen/planer';
 import { GRAD_NAMEN, type Grad, heute, istRichtig, kannStand, tageBis } from '../../lernen/stand';
 import { LektionAnsicht } from '../LektionAnsicht';
@@ -37,6 +38,7 @@ export function Heute({ geheZu }: { geheZu: GeheZu }) {
   const naechste = naechsteEinheit(stand);
   const heuteGeschafft = EINHEITEN.some((e) => stand.einheiten[e.id]?.fertigAm === tag);
   const faellig = faelligeKann(stand, tag);
+  const fehlerFaellig = faelligeFehler(stand, tag).length;
   const resttage = stand.klausurDatum ? tageBis(tag, stand.klausurDatum) : null;
   const offen = EINHEITEN.filter((e) => istVerfuegbar(e) && !stand.einheiten[e.id]?.fertigAm).length;
   const begonnen = naechste ? (stand.einheiten[naechste.id]?.schritt ?? 0) > 0 : false;
@@ -91,6 +93,19 @@ export function Heute({ geheZu }: { geheZu: GeheZu }) {
           <p>Übe jetzt gezielt nach der Kann-Liste, bis alle Lernziele klausurfest sind.</p>
           <button className="knopf primaer" onClick={() => geheZu({ seite: 'kann' })}>
             Zur Kann-Liste
+          </button>
+        </section>
+      )}
+
+      {fehlerFaellig > 0 && (
+        <section className="karte">
+          <h3>Fehlerheft</h3>
+          <p>
+            {fehlerFaellig === 1 ? 'Eine Aufgabe, die gestern nicht geklappt hat, ist' : `${fehlerFaellig} Aufgaben, die zuletzt nicht geklappt haben, sind`} heute
+            wieder dran.
+          </p>
+          <button className="knopf" onClick={() => geheZu({ seite: 'fehlerheft' })}>
+            Fehlerheft öffnen
           </button>
         </section>
       )}

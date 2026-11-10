@@ -155,16 +155,42 @@ describe('Planer', () => {
     }
   });
 
-  it('wählt Aufwärmfragen nur zu fälligen Lernzielen und nie aus der laufenden Einheit', () => {
+  it('wählt Aufwärmfragen zu Fehlern und fälligen Lernzielen, nie aus der laufenden Einheit', () => {
     let s = verbuche(neuerStand(), versuch({ punkte: 2 }));
     expect(faelligeKann(s, '2026-11-10')).toEqual([]);
     expect(faelligeKann(s, '2026-11-11')).toEqual(['k1-begriffe']);
     const wahl = aufwaermAufgaben(s, '2026-11-11', new Set(['b1-objektdiagramm']));
-    expect(wahl).toHaveLength(1);
-    expect(aufgabe(wahl[0])?.kann).toContain('k1-begriffe');
-    expect(wahl[0]).not.toBe('b1-objektdiagramm');
+    // Zuerst die Aufgabe aus dem Fehlerheft, dann eine weitere zum fälligen Lernziel.
+    expect(wahl[0]).toBe('b1-begriffe-zuordnen');
+    expect(wahl).toHaveLength(2);
+    expect(aufgabe(wahl[1])?.kann).toContain('k1-begriffe');
+    expect(wahl).not.toContain('b1-objektdiagramm');
     // Was heute schon bearbeitet wurde, kommt nicht noch einmal.
-    s = verbuche(s, versuch({ aufgabe: wahl[0], tag: '2026-11-11', punkte: 2 }));
-    expect(aufwaermAufgaben(s, '2026-11-11', new Set(['b1-objektdiagramm']))).not.toContain(wahl[0]);
+    s = verbuche(s, versuch({ aufgabe: wahl[1], tag: '2026-11-11', punkte: 2 }));
+    expect(aufwaermAufgaben(s, '2026-11-11', new Set(['b1-objektdiagramm']))).not.toContain(wahl[1]);
+  });
+});
+
+import { faelligeFehler, fehlerheft, musterStatistik } from '../../src/lernen/fehlerheft';
+
+describe('Fehlerheft', () => {
+  it('nimmt Fehlversuche auf und legt sie am nächsten Tag wieder vor', () => {
+    let s = verbuche(neuerStand(), versuch({ aufgabe: 'b1-objektdiagramm', punkte: 1, max: 4, muster: ['ablauf.grenzfall'] }));
+    const [e] = fehlerheft(s);
+    expect(e).toMatchObject({ aufgabe: 'b1-objektdiagramm', status: 'offen', fehlversuche: 1, muster: ['ablauf.grenzfall'], faelligAm: '2026-11-11' });
+    expect(faelligeFehler(s, '2026-11-10')).toEqual([]);
+    expect(faelligeFehler(s, '2026-11-11').map((x) => x.aufgabe)).toEqual(['b1-objektdiagramm']);
+    expect(musterStatistik(s)).toEqual([{ id: 'ablauf.grenzfall', anzahl: 1 }]);
+    // Am selben Tag behoben: Wiedervorlage erst nach drei Tagen.
+    s = verbuche(s, versuch({ aufgabe: 'b1-objektdiagramm', punkte: 4, max: 4 }));
+    expect(fehlerheft(s)[0]).toMatchObject({ status: 'offen', faelligAm: '2026-11-13' });
+    // An einem späteren Tag ohne Hinweis richtig: gefestigt.
+    s = verbuche(s, versuch({ aufgabe: 'b1-objektdiagramm', punkte: 4, max: 4, tag: '2026-11-13' }));
+    expect(fehlerheft(s)[0]).toMatchObject({ status: 'gefestigt', faelligAm: null });
+  });
+
+  it('Aufwärmfragen beginnen mit einem fälligen Eintrag aus dem Fehlerheft', () => {
+    const s = verbuche(neuerStand(), versuch({ aufgabe: 'v22-bis-zur-wand', kann: ['k22-lesen'], punkte: 0, max: 2 }));
+    expect(aufwaermAufgaben(s, '2026-11-11', new Set())[0]).toBe('v22-bis-zur-wand');
   });
 });

@@ -9,6 +9,8 @@ export interface Abgabe {
   punkte: number;
   max: number;
   quelle: 'automatisch' | 'selbst' | 'ki';
+  /** Erkannte Fehlermuster (Katalog-IDs) für das Fehlerheft. */
+  muster?: string[];
 }
 
 export interface TeilProps<T extends Aufgabe['typ']> {

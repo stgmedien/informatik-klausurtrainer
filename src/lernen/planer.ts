@@ -1,6 +1,7 @@
 // Wählt aus, was heute dran ist: nächste Einheit und passende Aufwärmfragen.
 import { AUFGABEN, EINHEITEN, KANNLISTE, aufgabe, lektion } from '../inhalte';
 import type { Aufgabe, Einheit, EinheitSchritt } from '../inhalte/typen';
+import { faelligeFehler } from './fehlerheft';
 import { type Grad, type Lernstand, kannStand, letzterVersuch } from './stand';
 
 export function istVerfuegbar(e: Einheit): boolean {
@@ -29,18 +30,24 @@ export function faelligeKann(stand: Lernstand, tag: string): string[] {
     .map(({ id }) => id);
 }
 
-const SCHNELL: Aufgabe['typ'][] = ['auswahl', 'zuordnen', 'reihenfolge', 'luecke', 'wahrheitstabelle', 'auswertung', 'klassen-lesen'];
+const SCHNELL: Aufgabe['typ'][] = ['auswahl', 'zuordnen', 'reihenfolge', 'luecke', 'wahrheitstabelle', 'auswertung', 'klassen-lesen', 'vorhersage'];
 
 /**
- * Kurze, automatisch auswertbare Aufgaben zu fälligen Lernzielen – als Abruf zu Beginn einer Einheit.
- * Bevorzugt Aufgaben, die am längsten nicht bearbeitet wurden, und nie solche, die heute schon dran waren.
+ * Kurze, automatisch auswertbare Aufgaben als Abruf zu Beginn einer Einheit: zuerst fällige Einträge
+ * aus dem Fehlerheft (höchstens einer), dann Aufgaben zu fälligen Lernzielen. Bevorzugt werden Aufgaben,
+ * die am längsten nicht bearbeitet wurden, und nie solche, die heute schon dran waren.
  */
 export function aufwaermAufgaben(stand: Lernstand, tag: string, ohne: ReadonlySet<string>, max = 3): string[] {
   const gewaehlt: string[] = [];
+  const fehler = faelligeFehler(stand, tag).find((e) => {
+    const a = aufgabe(e.aufgabe);
+    return a && SCHNELL.includes(a.typ) && a.minuten <= 3 && !ohne.has(a.id);
+  });
+  if (fehler) gewaehlt.push(fehler.aufgabe);
   for (const kannId of faelligeKann(stand, tag)) {
     if (gewaehlt.length >= max) break;
     const kandidaten = AUFGABEN.filter(
-      (a) => a.kann.includes(kannId) && SCHNELL.includes(a.typ) && a.minuten <= 2 && !ohne.has(a.id) && !gewaehlt.includes(a.id),
+      (a) => a.kann.includes(kannId) && SCHNELL.includes(a.typ) && a.minuten <= 3 && !ohne.has(a.id) && !gewaehlt.includes(a.id),
     )
       .map((a) => ({ a, zuletzt: letzterVersuch(stand, a.id) }))
       .filter(({ zuletzt }) => zuletzt?.tag !== tag)

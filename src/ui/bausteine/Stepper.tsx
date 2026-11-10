@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { Diagnose, Lauf, Programm } from '../../engine/java';
 import type { Welt } from '../../engine/welt';
 import { beschreibeSchritt, endeText, zeigeJavaWert } from '../../lernen/ausfuehren';
+import { Inline } from '../Markdown';
 import { CodeAnsicht } from './MaterialAnsicht';
 import { WeltAnsicht } from './WeltAnsicht';
 
@@ -147,13 +148,19 @@ export function DiagnoseListe({ diagnosen, onZeile }: { diagnosen: Diagnose[]; o
             Zeile {d.pos.zeile}
           </button>
           <span className="diagnose-inhalt">
-            <span className="marke">{SCHWERE[d.schwere]}</span> {d.text}
+            <span>
+              <span className="marke">{SCHWERE[d.schwere]}</span> <Inline text={d.text} />
+            </span>
             {d.javac && (
               <span className="javac">
                 Java-Compiler: <code>{d.javac}</code>
               </span>
             )}
-            {d.tipp && <span className="diagnose-tipp">Auf Papier: {d.tipp}</span>}
+            {d.tipp && (
+              <span className="diagnose-tipp">
+                Auf Papier: <Inline text={d.tipp} />
+              </span>
+            )}
           </span>
         </li>
       ))}

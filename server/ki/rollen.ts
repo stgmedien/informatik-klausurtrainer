@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { KiFehler, frage, modell } from './klient';
-import { SYSTEM_KORREKTUR, SYSTEM_TUTOR, nachrichtKorrektur, nachrichtTutor } from './prompts';
-import type { KorrekturErgebnis, TutorErgebnis } from './typen';
+import { SYSTEM_DIAGNOSE, SYSTEM_KORREKTUR, SYSTEM_TUTOR, nachrichtDiagnose, nachrichtKorrektur, nachrichtTutor } from './prompts';
+import type { DiagnoseErgebnis, KorrekturErgebnis, TutorErgebnis } from './typen';
 
 const OperatorSchema = z.object({ name: z.string(), definition: z.string(), erwartet: z.string() });
 
@@ -76,4 +76,31 @@ export async function gibHinweis(koerper: unknown): Promise<TutorErgebnis> {
   const anfrage = pruefe(TutorAnfrageSchema, koerper);
   const roh = await frage({ schema: TutorAntwort, system: SYSTEM_TUTOR, nachricht: nachrichtTutor(anfrage), aufwand: 'low' });
   return { hinweis: roh.hinweis.trim(), modell: modell() };
+}
+
+const DiagnoseAnfrageSchema = z.object({
+  stellung: z.string().min(1).max(8000),
+  quelltext: z.string().min(1).max(12000),
+  befunde: z.array(z.string().max(2000)).max(40),
+  katalog: z.array(z.object({ id: z.string(), titel: z.string() })).min(1).max(60),
+});
+
+const DiagnoseAntwort = z.object({
+  muster: z.array(z.string()).describe('Ein bis zwei ids aus dem Katalog'),
+  erklaerung: z.string().describe('Zwei bis drei Sätze: Wo liegt die Ursache und was passiert dort?'),
+  woran_erkennen: z.string().describe('Ein Satz: Woran man den Fehler auf Papier selbst bemerkt'),
+  naechster_schritt: z.string().describe('Ein Satz: Was als Nächstes zu prüfen oder zu ändern ist, ohne die Lösung vorzusagen'),
+});
+
+export async function diagnostiziere(koerper: unknown): Promise<DiagnoseErgebnis> {
+  const anfrage = pruefe(DiagnoseAnfrageSchema, koerper);
+  const roh = await frage({ schema: DiagnoseAntwort, system: SYSTEM_DIAGNOSE, nachricht: nachrichtDiagnose(anfrage), aufwand: 'medium' });
+  const erlaubt = new Set(anfrage.katalog.map((m) => m.id));
+  return {
+    muster: roh.muster.filter((id) => erlaubt.has(id)).slice(0, 2),
+    erklaerung: roh.erklaerung,
+    woranErkennen: roh.woran_erkennen,
+    naechsterSchritt: roh.naechster_schritt,
+    modell: modell(),
+  };
 }

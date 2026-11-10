@@ -1576,3 +1576,353 @@ figcaption {
 .rueckgabe {
   margin-top: 10px;
 }
+
+/* ---------- Programmieren und Rotstift-Bilanz ---------- */
+.testwelten {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.testwelten .material {
+  margin: 8px 0;
+}
+.papier-hinweis {
+  background: #fffef8;
+  border: 1px dashed var(--linie-stark);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.92rem;
+  color: var(--tinte-2);
+}
+.rotstift {
+  margin-top: 16px;
+  display: grid;
+  gap: 10px;
+}
+.rotstift h4 {
+  margin: 0;
+  color: var(--schlecht);
+}
+.rs-block {
+  border: 1px solid var(--linie);
+  border-left: 5px solid var(--linie-stark);
+  border-radius: 8px;
+  padding: 10px 14px;
+  background: #fff;
+}
+.rs-block h5 {
+  margin: 0 0 6px;
+  font-size: 0.98rem;
+}
+.rs-block.gut {
+  border-left-color: var(--gut);
+}
+.rs-block.schlecht {
+  border-left-color: var(--schlecht);
+}
+.rs-block.hinweis-block {
+  border-left-color: #d9a521;
+  background: #fffdf3;
+}
+.rs-block.ki-diagnose {
+  border-left-color: var(--akzent);
+  background: var(--akzent-hell);
+}
+.rs-block .marke {
+  margin-right: 6px;
+}
+.testliste {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 6px;
+}
+.testliste li {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 6px 8px;
+  border-radius: 6px;
+}
+.testliste li.richtig {
+  background: var(--gut-hell);
+}
+.testliste li.falsch {
+  background: var(--schlecht-hell);
+}
+.test-zeichen {
+  font-weight: 700;
+  width: 1.2em;
+}
+.testliste li.richtig .test-zeichen {
+  color: var(--gut);
+}
+.testliste li.falsch .test-zeichen {
+  color: var(--schlecht);
+}
+.test-text {
+  flex: 1;
+  display: grid;
+}
+.test-grund {
+  font-size: 0.92rem;
+}
+.test-ablauf {
+  margin-top: 8px;
+}
+.muster-liste {
+  margin: 0;
+  padding-left: 1.2em;
+  display: grid;
+  gap: 6px;
+}
+.fehlvariante {
+  font-weight: 600;
+}
+.abzuege {
+  font-size: 0.92rem;
+  color: var(--tinte-2);
+}
+.ki-diagnose-start {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* ---------- Zeilen ordnen ---------- */
+.zo-spalten {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+  gap: 16px;
+}
+@media (max-width: 760px) {
+  .zo-spalten {
+    grid-template-columns: 1fr;
+  }
+}
+.zo-vorrat,
+.zo-programm {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 4px;
+}
+.zo-zeile {
+  width: 100%;
+  text-align: left;
+  font-family: var(--mono);
+  font-size: 0.86rem;
+  border: 1px solid var(--linie-stark);
+  background: #fff;
+  border-radius: 6px;
+  padding: 5px 10px;
+  white-space: pre;
+}
+.zo-zeile:hover:not(:disabled) {
+  border-color: var(--akzent);
+  background: var(--akzent-hell);
+}
+.zo-programm {
+  background: #fffef8;
+  border: 1px solid var(--linie);
+  border-radius: 8px;
+  padding: 6px;
+  min-height: 3em;
+}
+.zo-gesetzt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 4px;
+  padding: 1px 4px;
+}
+.zo-gesetzt.richtig {
+  background: var(--gut-hell);
+}
+.zo-gesetzt.falsch {
+  background: var(--schlecht-hell);
+}
+.zo-text {
+  flex: 1;
+  background: none;
+  white-space: pre;
+  font-size: 0.86rem;
+}
+.zo-knoepfe {
+  display: flex;
+  gap: 2px;
+}
+.zo-knoepfe .mini {
+  width: 26px;
+  height: 24px;
+  font-size: 0.75rem;
+}
+
+/* ---------- Struktogramm (Farben wie im Unterricht) ---------- */
+.sg-gruppe {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-start;
+}
+.sg {
+  --sg-linie: #1c2333;
+  --sg-anw: #fdedce;
+  --sg-schleife: #dcefe7;
+  --sg-verz: #fadad1;
+  min-width: 260px;
+  max-width: 100%;
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+.sg-titel {
+  font-weight: 700;
+  font-family: var(--mono);
+  font-size: 0.86rem;
+  margin-bottom: 4px;
+}
+.sg-koerper {
+  border: 1.5px solid var(--sg-linie);
+  border-bottom: 0;
+  background: #fff;
+}
+.sg-anw {
+  background: var(--sg-anw);
+  border-bottom: 1.5px solid var(--sg-linie);
+  padding: 6px 10px;
+}
+.sg-aufruf {
+  padding: 0;
+}
+.sg-aufruf span {
+  display: block;
+  margin: 0 10px;
+  padding: 6px 10px;
+  border-left: 1.5px solid var(--sg-linie);
+  border-right: 1.5px solid var(--sg-linie);
+}
+.sg-schleife {
+  background: var(--sg-schleife);
+  border-bottom: 1.5px solid var(--sg-linie);
+}
+.sg-bed {
+  padding: 6px 10px;
+  font-weight: 600;
+}
+.sg-rumpf {
+  margin-left: 22px;
+  border-left: 1.5px solid var(--sg-linie);
+  border-top: 1.5px solid var(--sg-linie);
+}
+.sg-schleife.fuss > .sg-rumpf {
+  border-top: 0;
+  border-bottom: 0;
+}
+.sg-schleife.fuss > .sg-bed {
+  border-top: 1.5px solid var(--sg-linie);
+}
+.sg-rumpf > :last-child,
+.sg-zweig > :last-child {
+  border-bottom: 0;
+}
+.sg-verz {
+  background: var(--sg-verz);
+  border-bottom: 1.5px solid var(--sg-linie);
+}
+.sg-dreieck {
+  position: relative;
+  min-height: 62px;
+  padding: 6px 12px 22px;
+  text-align: center;
+}
+.sg-dreieck svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.sg-dreieck line {
+  stroke: var(--sg-linie);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+.sg-frage {
+  position: relative;
+  font-weight: 600;
+  display: inline-block;
+  max-width: 70%;
+}
+.sg-wahr,
+.sg-falsch {
+  position: absolute;
+  bottom: 3px;
+  font-size: 0.8rem;
+}
+.sg-wahr {
+  left: 8px;
+}
+.sg-falsch {
+  right: 8px;
+}
+.sg-zweige {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 1.5px solid var(--sg-linie);
+}
+.sg-zweig {
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+}
+.sg-zweig + .sg-zweig {
+  border-left: 1.5px solid var(--sg-linie);
+}
+.sg-zweig > * {
+  flex: none;
+}
+.sg-zweig > :last-child {
+  flex: 1;
+}
+.sg-leer {
+  padding: 6px 10px;
+  text-align: center;
+  color: var(--tinte-2);
+  background: #fff;
+}
+.sg .aktiv {
+  outline: 3px solid #e3a400;
+  outline-offset: -3px;
+  position: relative;
+  z-index: 1;
+}
+.sg-anw.aktiv {
+  background: #ffe28a;
+}
+
+/* ---------- Fehlerheft ---------- */
+.muster-statistik {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+.muster-statistik li {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+}
+.muster-zahl {
+  font-weight: 700;
+  color: var(--schlecht);
+  min-width: 2.2em;
+}
+.eintrag-muster {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}

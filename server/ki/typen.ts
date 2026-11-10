@@ -49,6 +49,23 @@ export interface TutorErgebnis {
   modell: string;
 }
 
+export interface DiagnoseAnfrage {
+  stellung: string;
+  quelltext: string;
+  /** Automatisch ermittelte Befunde: Compilermeldungen, Testergebnisse, erkannte Muster. */
+  befunde: string[];
+  /** Erlaubte Fehlermuster (Katalog), aus denen die KI auswählt. */
+  katalog: { id: string; titel: string }[];
+}
+
+export interface DiagnoseErgebnis {
+  muster: string[];
+  erklaerung: string;
+  woranErkennen: string;
+  naechsterSchritt: string;
+  modell: string;
+}
+
 export interface KiFehlerAntwort {
   fehler: string;
 }

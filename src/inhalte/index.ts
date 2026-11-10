@@ -2,6 +2,8 @@ import { AUFGABEN_B1 } from './aufgaben/b1';
 import { AUFGABEN_B21_B23 } from './aufgaben/b21-b23';
 import { AUFGABEN_B24 } from './aufgaben/b24';
 import { AUFGABEN_B27 } from './aufgaben/b27';
+import { AUFGABEN_ORDNEN } from './aufgaben/ordnen';
+import { AUFGABEN_PROGRAMMIEREN } from './aufgaben/programmieren';
 import { AUFGABEN_VORHERSAGE } from './aufgaben/vorhersagen';
 import { EINHEITEN } from './einheiten';
 import { LEKTIONEN_B1 } from './lektionen/b1';
@@ -15,7 +17,7 @@ export { BEREICHE, KANNLISTE, kannItem } from './kannliste';
 export { OPERATOREN, operator } from './operatoren';
 export { EINHEITEN };
 
-export const AUFGABEN: Aufgabe[] = [...AUFGABEN_B1, ...AUFGABEN_B21_B23, ...AUFGABEN_B24, ...AUFGABEN_B27, ...AUFGABEN_VORHERSAGE];
+export const AUFGABEN: Aufgabe[] = [...AUFGABEN_B1, ...AUFGABEN_B21_B23, ...AUFGABEN_B24, ...AUFGABEN_B27, ...AUFGABEN_VORHERSAGE, ...AUFGABEN_PROGRAMMIEREN, ...AUFGABEN_ORDNEN];
 export const LEKTIONEN: Lektion[] = [...LEKTIONEN_B1, ...LEKTIONEN_B21_B23, ...LEKTIONEN_B24, ...LEKTIONEN_B27];
 
 const aufgabenNachId = new Map(AUFGABEN.map((a) => [a.id, a]));
@@ -55,4 +57,6 @@ export const TYP_NAMEN: Record<Aufgabe['typ'], string> = {
   auswertung: 'Ausdruck auswerten',
   'klassen-lesen': 'Klassendiagramm lesen',
   vorhersage: 'Ablauf vorhersagen',
+  programmieren: 'Programmieren',
+  'zeilen-ordnen': 'Zeilen ordnen',
 };

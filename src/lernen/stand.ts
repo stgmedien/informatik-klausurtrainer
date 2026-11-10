@@ -24,6 +24,8 @@ export interface Versuch {
   quelle: 'automatisch' | 'selbst' | 'ki';
   hinweise: number;
   klausurnah: boolean;
+  /** Erkannte Fehlermuster (Katalog-IDs). */
+  muster?: string[];
 }
 
 export interface Lernstand {
@@ -41,6 +43,8 @@ export interface Lernstand {
   /** Zuletzt eingegebener Freitext je Aufgabe. */
   antworten: Record<string, string>;
   gelesen: Record<string, string>;
+  /** Beschriftung der Verzweigung im Struktogramm: Arbeitsblatt (Wahr/Falsch) oder Video (Ja/Nein). */
+  struktoBeschriftung?: 'wahr-falsch' | 'ja-nein';
 }
 
 export function heute(datum = new Date()): string {

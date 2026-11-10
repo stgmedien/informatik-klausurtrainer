@@ -1,4 +1,4 @@
-import type { KorrekturAnfrage, KorrekturErgebnis, TutorAnfrage, TutorErgebnis } from '../../server/ki/typen';
+import type { DiagnoseAnfrage, DiagnoseErgebnis, KorrekturAnfrage, KorrekturErgebnis, TutorAnfrage, TutorErgebnis } from '../../server/ki/typen';
 
 async function sende<T>(pfad: string, koerper: unknown): Promise<T> {
   let antwort: Response;
@@ -18,4 +18,8 @@ export function korrigiere(anfrage: KorrekturAnfrage): Promise<KorrekturErgebnis
 
 export function frageTutor(anfrage: TutorAnfrage): Promise<TutorErgebnis> {
   return sende<TutorErgebnis>('/api/ki/tutor', anfrage);
+}
+
+export function diagnostiziere(anfrage: DiagnoseAnfrage): Promise<DiagnoseErgebnis> {
+  return sende<DiagnoseErgebnis>('/api/ki/diagnose', anfrage);
 }

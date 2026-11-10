@@ -139,3 +139,33 @@ export function bewerteVorhersage(a: Von<'vorhersage'>, antwort: VorhersageAntwo
   const richtig = pruefeVorhersage(antwort, loeseVorhersage(a).loesung);
   return anteil(a.fragen.filter((f) => richtig[f]).length, a.fragen.length, a.punkte);
 }
+
+export interface LoesungsZeile {
+  text: string;
+  stufe: number;
+}
+
+/** Zerlegt die Musterlösung in Zeilen mit Einrückungsstufe (4 Leerzeichen je Stufe). */
+export function zeilenDerLoesung(loesung: string): LoesungsZeile[] {
+  return loesung
+    .split('\n')
+    .filter((z) => z.trim() !== '')
+    .map((z) => ({ text: z.trim(), stufe: Math.round((z.length - z.trimStart().length) / 4) }));
+}
+
+/**
+ * Zeilen ordnen: Drei Viertel der Punkte für die Reihenfolge, ein Viertel für die Einrückung.
+ * Eine Zeile steht richtig, wenn an ihrer Stelle in der Lösung derselbe Text steht.
+ */
+export function bewerteZeilen(
+  a: Von<'zeilen-ordnen'>,
+  gesetzt: readonly LoesungsZeile[],
+): Bewertung & { stelleRichtig: boolean[]; stufeRichtig: boolean[] } {
+  const loesung = zeilenDerLoesung(a.loesung);
+  const stelleRichtig = gesetzt.map((z, i) => loesung[i]?.text === z.text);
+  const stufeRichtig = gesetzt.map((z, i) => stelleRichtig[i] && loesung[i].stufe === z.stufe);
+  const reihenfolge = stelleRichtig.filter(Boolean).length / Math.max(loesung.length, gesetzt.length);
+  const einrueckung = stufeRichtig.filter(Boolean).length / loesung.length;
+  const punkte = Math.round((reihenfolge * 0.75 + einrueckung * 0.25) * a.punkte * 2) / 2;
+  return { punkte, max: a.punkte, stelleRichtig, stufeRichtig };
+}
