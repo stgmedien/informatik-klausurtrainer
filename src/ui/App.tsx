@@ -10,6 +10,8 @@ import { Kannliste, Ueben } from './seiten/Lernen';
 import { Einstellungen, Spickzettel } from './seiten/Rest';
 import { Werkstatt } from './seiten/Werkstatt';
 import { Fehlerheft } from './seiten/Fehlerheft';
+import { Druck } from './seiten/Druck';
+import { KlausurSpieler, KlausurUebersicht } from './seiten/Probeklausur';
 
 const NAVIGATION: { ansicht: Ansicht; titel: string }[] = [
   { ansicht: { seite: 'heute' }, titel: 'Heute' },
@@ -17,6 +19,7 @@ const NAVIGATION: { ansicht: Ansicht; titel: string }[] = [
   { ansicht: { seite: 'ueben' }, titel: 'Üben' },
   { ansicht: { seite: 'werkstatt' }, titel: 'Werkstatt' },
   { ansicht: { seite: 'fehlerheft' }, titel: 'Fehlerheft' },
+  { ansicht: { seite: 'klausuren' }, titel: 'Probeklausur' },
   { ansicht: { seite: 'spick' }, titel: 'Spickzettel' },
   { ansicht: { seite: 'einstellungen' }, titel: 'Einstellungen' },
 ];
@@ -24,6 +27,7 @@ const NAVIGATION: { ansicht: Ansicht; titel: string }[] = [
 /** Unterseiten zählen in der Navigation zu ihrer Herkunft. */
 function hauptseite(a: Ansicht): Ansicht['seite'] {
   if (a.seite === 'einheit' || a.seite === 'wiederholung') return 'heute';
+  if (a.seite === 'klausur' || a.seite === 'druck') return 'klausuren';
   if (a.seite === 'aufgabe' || a.seite === 'lektion' || a.seite === 'logik') return hauptseite(a.zurueck);
   return a.seite;
 }
@@ -108,6 +112,15 @@ export function App() {
     case 'fehlerheft':
       inhalt = <Fehlerheft geheZu={geheZu} />;
       break;
+    case 'klausuren':
+      inhalt = <KlausurUebersicht geheZu={geheZu} />;
+      break;
+    case 'klausur':
+      inhalt = <KlausurSpieler key={ansicht.id} id={ansicht.id} onEnde={() => geheZu({ seite: 'klausuren' })} />;
+      break;
+    case 'druck':
+      inhalt = <Druck id={ansicht.id} onEnde={() => geheZu({ seite: 'klausuren' })} />;
+      break;
     case 'spick':
       inhalt = <Spickzettel />;
       break;
@@ -118,7 +131,7 @@ export function App() {
 
   return (
     <>
-      <header className="kopfleiste">
+      <header className="kopfleiste nicht-drucken">
         <div className="kopf-innen">
           <button className="logo" onClick={() => geheZu({ seite: 'heute' })} aria-label="Spinnen-Trainer, zur Startseite">
             <img src="/bilder/thekla.png" alt="" width={28} height={28} />

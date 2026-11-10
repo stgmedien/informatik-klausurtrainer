@@ -8,6 +8,7 @@ import { LektionAnsicht } from '../LektionAnsicht';
 import { LogikTraining } from '../LogikTraining';
 import type { GeheZu } from '../ansicht';
 import { AufgabeAnsicht } from '../aufgaben/AufgabeAnsicht';
+import { KlausurSpieler } from './Probeklausur';
 import { datumLang, punkteText } from '../hilfen';
 import { useStand } from '../kontext';
 
@@ -272,6 +273,8 @@ export function EinheitSpieler({ einheit, onEnde }: { einheit: Einheit; onEnde: 
     } else if (s.art === 'aufgabe') {
       const a = aufgabe(s.id);
       inhalt = a ? <AufgabeAnsicht key={a.id} aufgabe={a} onWeiter={weiter} weiterText={schritt + 1 >= einheit.schritte.length ? 'Einheit abschließen' : 'Weiter'} /> : null;
+    } else if (s.art === 'klausur') {
+      inhalt = <KlausurSpieler key={`klausur-${s.id}`} id={s.id} onEnde={weiter} />;
     } else {
       inhalt = <LogikTraining key={`logik-${schritt}`} modus={s.modus} stufe={s.stufe} anzahl={s.anzahl} onFertig={weiter} />;
     }

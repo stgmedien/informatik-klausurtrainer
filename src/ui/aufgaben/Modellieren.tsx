@@ -13,7 +13,7 @@ import { AbgabeKnopf, type TeilProps } from './einfach';
  * Struktogramm zeichnen: auf Papier, dann mit dem Muster-Struktogramm vergleichen.
  * Die Checkliste zerlegt das Muster in einzelne Bausteine, die man abhakt.
  */
-export function StruktogrammZeichnen({ aufgabe, fertig, onAbgabe }: TeilProps<'struktogramm-zeichnen'>) {
+export function StruktogrammZeichnen({ aufgabe, fertig, onAbgabe, onEingereicht }: TeilProps<'struktogramm-zeichnen'>) {
   const programm = useMemo(() => uebersetze(aufgabe.musterloesung).programm, [aufgabe]);
   const bilder = useMemo(
     () => (programm ? struktogrammeMitHilfsmethoden(programm, aufgabe.methode).filter((_, i) => i === 0 || aufgabe.mitHilfsmethoden) : []),
@@ -38,7 +38,14 @@ export function StruktogrammZeichnen({ aufgabe, fertig, onAbgabe }: TeilProps<'s
             <strong>Auf Papier:</strong> Zeichne das Struktogramm auf ein Blatt – mit Lineal, wie in der Klausur. Formuliere Bedingungen als Fragen
             („Ist ein Hindernis vor mir?“) und Anweisungen in ganzen Sätzen oder als Methodenaufruf. Wenn du fertig bist, vergleiche mit dem Muster.
           </p>
-          <AbgabeKnopf aktiv onClick={() => setVergleichen(true)} text="Fertig gezeichnet – vergleichen" />
+          <AbgabeKnopf
+            aktiv
+            onClick={() => {
+              setVergleichen(true);
+              onEingereicht?.();
+            }}
+            text="Fertig gezeichnet – vergleichen"
+          />
         </>
       ) : (
         <div className="strukto-vergleich">
@@ -99,7 +106,7 @@ function bereinigt(m: KlassenModell): KlassenModell {
 }
 
 /** Klassendiagramm modellieren: Formular-Editor mit Live-Vorschau, bewertet nach Erwartungshorizont. */
-export function KlassenModellieren({ aufgabe, fertig, onAbgabe }: TeilProps<'klassen-modellieren'>) {
+export function KlassenModellieren({ aufgabe, fertig, onAbgabe, onEingereicht }: TeilProps<'klassen-modellieren'>) {
   const { stand, aendere, ki } = useStand();
   const [modell, setModell] = useState<KlassenModell>(() => {
     try {
@@ -119,6 +126,7 @@ export function KlassenModellieren({ aufgabe, fertig, onAbgabe }: TeilProps<'kla
   const abgeben = (mitKi: boolean) => {
     aendere((s) => ({ ...s, antworten: { ...s.antworten, [aufgabe.id]: JSON.stringify(modell) } }));
     setAbgegeben({ mitKi });
+    onEingereicht?.();
   };
 
   if (abgegeben) {

@@ -43,6 +43,8 @@ export interface Lernstand {
   /** Zuletzt eingegebener Freitext je Aufgabe. */
   antworten: Record<string, string>;
   gelesen: Record<string, string>;
+  /** Durchgänge der Probeklausuren. */
+  klausuren?: Record<string, { start: string; ende?: string; punkte?: number; max?: number }[]>;
   /** Beschriftung der Verzweigung im Struktogramm: Arbeitsblatt (Wahr/Falsch) oder Video (Ja/Nein). */
   struktoBeschriftung?: 'wahr-falsch' | 'ja-nein';
 }

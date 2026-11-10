@@ -201,7 +201,7 @@ export function ErwartungsVergleich({ aufgabe, erwartung, antwort, antwortAnsich
 }
 
 /** Freitext: erst schreiben, dann nach Erwartungshorizont bewerten (mit KI oder selbst). */
-export function Freitext({ aufgabe, fertig, onAbgabe, onEntwurf }: TeilProps<'freitext'>) {
+export function Freitext({ aufgabe, fertig, onAbgabe, onEntwurf, onEingereicht }: TeilProps<'freitext'>) {
   const { stand, aendere, ki } = useStand();
   const [text, setText] = useState(stand.antworten[aufgabe.id] ?? '');
   const [abgegeben, setAbgegeben] = useState<null | { mitKi: boolean }>(null);
@@ -215,6 +215,7 @@ export function Freitext({ aufgabe, fertig, onAbgabe, onEntwurf }: TeilProps<'fr
   const abgeben = (mitKi: boolean) => {
     aendere((s) => ({ ...s, antworten: { ...s.antworten, [aufgabe.id]: text } }));
     setAbgegeben({ mitKi });
+    onEingereicht?.();
   };
 
   if (abgegeben) {

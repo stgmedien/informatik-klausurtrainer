@@ -21,6 +21,8 @@ export interface TeilProps<T extends Aufgabe['typ']> {
   onAbgabe: (abgabe: Abgabe) => void;
   /** Meldet den aktuellen Entwurf nach oben, damit der Tutor sich darauf beziehen kann. */
   onEntwurf?: (text: string) => void;
+  /** Die Antwort ist abgegeben, auch wenn die Bewertung noch aussteht (z.B. Selbsteinschätzung). */
+  onEingereicht?: () => void;
 }
 
 export function AbgabeKnopf({ aktiv, onClick, text = 'Abgeben' }: { aktiv: boolean; onClick: () => void; text?: string }) {

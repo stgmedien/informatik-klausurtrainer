@@ -23,10 +23,11 @@ interface KoerperProps {
   fertig: boolean;
   onAbgabe: (a: Abgabe) => void;
   onEntwurf: (text: string) => void;
+  onEingereicht: () => void;
 }
 
-function Koerper({ aufgabe, durchgang, fertig, onAbgabe, onEntwurf }: KoerperProps) {
-  const gemeinsam = { durchgang, fertig, onAbgabe, onEntwurf };
+function Koerper({ aufgabe, durchgang, fertig, onAbgabe, onEntwurf, onEingereicht }: KoerperProps) {
+  const gemeinsam = { durchgang, fertig, onAbgabe, onEntwurf, onEingereicht };
   switch (aufgabe.typ) {
     case 'auswahl':
       return <Auswahl aufgabe={aufgabe} {...gemeinsam} />;
@@ -63,9 +64,14 @@ interface Props {
   weiterText?: string;
   /** false: Der Versuch wird nicht im Lernstand verbucht (z.B. Vorschau). */
   verbuchen?: boolean;
+  /**
+   * Klausurmodus: keine Hinweise, kein Tutor, keine Erklärung des Operators. Solange `verdeckt` gilt,
+   * bleibt nach der Abgabe nur „abgegeben“ sichtbar; Ergebnis und Lösung erscheinen erst danach.
+   */
+  klausur?: { nummer: string; verdeckt: boolean; onEingereicht: () => void; onErgebnis: (a: Abgabe) => void };
 }
 
-export function AufgabeAnsicht({ aufgabe, onWeiter, weiterText = 'Weiter', verbuchen = true }: Props) {
+export function AufgabeAnsicht({ aufgabe, onWeiter, weiterText = 'Weiter', verbuchen = true, klausur }: Props) {
   const { aendere, ki } = useStand();
   const [durchgang, setDurchgang] = useState(0);
   // Zahl der aufgedeckten vorformulierten Hinweise (0–3).
@@ -74,6 +80,7 @@ export function AufgabeAnsicht({ aufgabe, onWeiter, weiterText = 'Weiter', verbu
   const [tutorLaedt, setTutorLaedt] = useState(false);
   const [tutorFehler, setTutorFehler] = useState<string | null>(null);
   const [ergebnis, setErgebnis] = useState<Abgabe | null>(null);
+  const [eingereicht, setEingereicht] = useState(false);
   const entwurf = useRef('');
   const op = operator(aufgabe.operator);
   const fertig = ergebnis !== null;
@@ -99,8 +106,15 @@ export function AufgabeAnsicht({ aufgabe, onWeiter, weiterText = 'Weiter', verbu
     }
   };
 
+  const einreichen = () => {
+    setEingereicht(true);
+    klausur?.onEingereicht();
+  };
+
   const abgabe = (a: Abgabe) => {
     setErgebnis(a);
+    einreichen();
+    klausur?.onErgebnis(a);
     if (!verbuchen) return;
     const jetzt = new Date();
     aendere((s) =>
@@ -114,7 +128,7 @@ export function AufgabeAnsicht({ aufgabe, onWeiter, weiterText = 'Weiter', verbu
         max: a.max,
         quelle: a.quelle,
         hinweise,
-        klausurnah: Boolean(aufgabe.klausurnah),
+        klausurnah: Boolean(aufgabe.klausurnah || klausur),
         ...(a.muster?.length ? { muster: a.muster } : {}),
       }),
     );
@@ -131,39 +145,47 @@ export function AufgabeAnsicht({ aufgabe, onWeiter, weiterText = 'Weiter', verbu
 
   const quote = ergebnis ? ergebnis.punkte / ergebnis.max : 0;
   const stufe = quote >= BESTANDEN_AB ? 'gut' : quote >= 0.5 ? 'mittel' : 'schwach';
+  const verdeckt = Boolean(klausur?.verdeckt && eingereicht);
 
   return (
-    <article className="aufgabe">
+    <article className={`aufgabe${klausur ? ' in-klausur' : ''}`}>
       <header className="aufgabe-kopf">
-        <h2>{aufgabe.titel}</h2>
+        <h2>
+          {klausur && <span className="aufgabe-nr">{klausur.nummer}</span>}
+          {aufgabe.titel}
+        </h2>
         <div className="marken">
-          {aufgabe.klausurnah && <span className="marke klausur">Klausurformat</span>}
+          {aufgabe.klausurnah && !klausur && <span className="marke klausur">Klausurformat</span>}
           <span className="marke">{aufgabe.punkte} P.</span>
-          <span className="marke">ca. {aufgabe.minuten} min</span>
+          {!klausur && <span className="marke">ca. {aufgabe.minuten} min</span>}
+          {verdeckt && <span className="marke grad-3">✓ abgegeben</span>}
         </div>
       </header>
-      {op && (
+      {op && !klausur && (
         <p className="operator-hinweis">
           Operator <strong>{op.name}</strong> (Anforderungsbereich {op.afb}): {op.erwartet}
         </p>
       )}
-      <Markdown text={aufgabe.stellung} klasse="stellung" />
-      {aufgabe.material?.map((m, i) => (
-        <MaterialAnsicht key={i} material={m} />
-      ))}
+      <div hidden={verdeckt}>
+        <Markdown text={aufgabe.stellung} klasse="stellung" />
+        {aufgabe.material?.map((m, i) => (
+          <MaterialAnsicht key={i} material={m} />
+        ))}
 
-      <Koerper
-        key={durchgang}
-        aufgabe={aufgabe}
-        durchgang={durchgang}
-        fertig={fertig}
-        onAbgabe={abgabe}
-        onEntwurf={(text) => {
-          entwurf.current = text;
-        }}
-      />
+        <Koerper
+          key={durchgang}
+          aufgabe={aufgabe}
+          durchgang={durchgang}
+          fertig={fertig}
+          onAbgabe={abgabe}
+          onEntwurf={(text) => {
+            entwurf.current = text;
+          }}
+          onEingereicht={einreichen}
+        />
+      </div>
 
-      {!fertig && (
+      {!fertig && !klausur && (
         <div className="hinweise">
           {aufgabe.hinweise.slice(0, stufen).map((h, i) => (
             <p key={i} className="hinweis">
@@ -195,20 +217,20 @@ export function AufgabeAnsicht({ aufgabe, onWeiter, weiterText = 'Weiter', verbu
         </div>
       )}
 
-      {ergebnis && (
+      {ergebnis && !verdeckt && (
         <div className={`ergebnis ${stufe}`} role="status">
           <strong>{punkteText(ergebnis.punkte, ergebnis.max)}</strong>
           {ergebnis.quelle === 'selbst' && <span> · eigene Einschätzung</span>}
           {ergebnis.quelle === 'ki' && <span> · Einschätzung der KI</span>}
           {hinweise > 0 && quote >= BESTANDEN_AB && <span> · mit Hinweis gelöst: zählt als geübt, noch nicht als sicher</span>}
-          {quote < BESTANDEN_AB && <span> · kommt als Wiederholung zurück</span>}
+          {quote < BESTANDEN_AB && !klausur && <span> · kommt als Wiederholung zurück</span>}
           <div className="ergebnis-ziele">
             Lernziel: {aufgabe.kann.map((id) => kannItem(id)?.kurz ?? id).join(' · ')}
           </div>
         </div>
       )}
 
-      {fertig && (
+      {fertig && !klausur && (
         <footer className="aufgabe-fuss">
           <button className="knopf leise" onClick={nochmal}>
             Nochmal versuchen

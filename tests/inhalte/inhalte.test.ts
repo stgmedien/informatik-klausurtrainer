@@ -160,3 +160,50 @@ describe('Abdeckung der Kann-Liste', () => {
     expect(zeilen).toHaveLength(KANNLISTE.length);
   });
 });
+
+import { PROBEKLAUSUREN } from '../../src/inhalte/klausuren';
+import { einheitMinuten as minutenDerEinheit } from '../../src/lernen/planer';
+import { notenpunkte, noteText } from '../../src/lernen/note';
+
+describe('Probeklausuren', () => {
+  for (const k of PROBEKLAUSUREN) {
+    it(`${k.id}: alle Aufgaben vorhanden, keine doppelt, Bearbeitungszeit passt`, () => {
+      const ids = k.teile.flatMap((t) => t.aufgaben);
+      expect(new Set(ids).size).toBe(ids.length);
+      const minuten = ids.reduce((s, id) => s + (aufgabe(id)?.minuten ?? NaN), 0);
+      expect(minuten, 'Summe der Aufgabenzeiten').toBeLessThanOrEqual(k.minuten);
+      expect(minuten).toBeGreaterThanOrEqual(k.minuten * 0.7);
+      // Jeder Bereich der Kann-Liste kommt vor.
+      const bereiche = new Set(ids.flatMap((id) => aufgabe(id)!.kann.map((kid) => KANNLISTE.find((x) => x.id === kid)!.bereich)));
+      for (const b of ['1', '2.4', '2.7']) expect(bereiche.has(b as never), `Bereich ${b}`).toBe(true);
+    });
+  }
+});
+
+describe('Tageseinheiten', () => {
+  it('jede Einheit hat 20 bis 30 Minuten', () => {
+    for (const e of EINHEITEN) {
+      const m = minutenDerEinheit(e);
+      expect(m, `${e.id}: ${m} min`).toBeGreaterThanOrEqual(20);
+      expect(m, `${e.id}: ${m} min`).toBeLessThanOrEqual(30);
+    }
+  });
+  it('zusammen decken sie jeden Bereich der Kann-Liste ab', () => {
+    const ids = new Set(EINHEITEN.flatMap((e) => e.schritte.flatMap((s) => (s.art === 'aufgabe' ? [s.id] : s.art === 'klausur' ? PROBEKLAUSUREN.find((k) => k.id === s.id)!.teile.flatMap((t) => t.aufgaben) : []))));
+    const bereiche = new Set([...ids].flatMap((id) => aufgabe(id)!.kann.map((k) => KANNLISTE.find((x) => x.id === k)!.bereich)));
+    for (const b of ['1', '2.1', '2.2', '2.3', '2.4', '2.5', '2.6', '2.7']) expect(bereiche.has(b as never), b).toBe(true);
+  });
+});
+
+describe('Notenschätzung', () => {
+  it('folgt der üblichen Oberstufen-Tabelle', () => {
+    expect(notenpunkte(100, 100)).toBe(15);
+    expect(notenpunkte(95, 100)).toBe(15);
+    expect(notenpunkte(94.9, 100)).toBe(14);
+    expect(notenpunkte(45, 100)).toBe(5);
+    expect(notenpunkte(44, 100)).toBe(4);
+    expect(notenpunkte(19, 100)).toBe(0);
+    expect(noteText(30, 40)).toBe('2 (11 Notenpunkte)');
+    expect(noteText(28, 40)).toBe('2− (10 Notenpunkte)');
+  });
+});

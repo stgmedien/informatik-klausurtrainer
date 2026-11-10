@@ -191,7 +191,8 @@ export interface Lektion {
 export type EinheitSchritt =
   | { art: 'lektion'; id: string }
   | { art: 'aufgabe'; id: string }
-  | { art: 'logiktraining'; modus: 'auswertung' | 'tabelle'; stufe: 1 | 2 | 3; anzahl: number };
+  | { art: 'logiktraining'; modus: 'auswertung' | 'tabelle'; stufe: 1 | 2 | 3; anzahl: number }
+  | { art: 'klausur'; id: string };
 
 export interface Einheit {
   id: string;

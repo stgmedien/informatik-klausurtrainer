@@ -1,5 +1,6 @@
 // Wählt aus, was heute dran ist: nächste Einheit und passende Aufwärmfragen.
 import { AUFGABEN, EINHEITEN, KANNLISTE, aufgabe, lektion } from '../inhalte';
+import { probeklausur } from '../inhalte/klausuren';
 import type { Aufgabe, Einheit, EinheitSchritt } from '../inhalte/typen';
 import { faelligeFehler } from './fehlerheft';
 import { type Grad, type Lernstand, kannStand, letzterVersuch } from './stand';
@@ -15,6 +16,7 @@ export function naechsteEinheit(stand: Lernstand): Einheit | undefined {
 export function schrittMinuten(s: EinheitSchritt): number {
   if (s.art === 'lektion') return lektion(s.id)?.minuten ?? 0;
   if (s.art === 'aufgabe') return aufgabe(s.id)?.minuten ?? 0;
+  if (s.art === 'klausur') return probeklausur(s.id)?.minuten ?? 0;
   return s.anzahl * 2;
 }
 

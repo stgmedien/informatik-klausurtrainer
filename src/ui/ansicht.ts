@@ -12,6 +12,9 @@ export type Ansicht =
   | { seite: 'logik'; modus: 'auswertung' | 'tabelle'; stufe: 1 | 2 | 3; zurueck: Ansicht }
   | { seite: 'werkstatt' }
   | { seite: 'fehlerheft' }
+  | { seite: 'klausuren' }
+  | { seite: 'klausur'; id: string }
+  | { seite: 'druck'; id: string }
   | { seite: 'spick' }
   | { seite: 'einstellungen' };
 
