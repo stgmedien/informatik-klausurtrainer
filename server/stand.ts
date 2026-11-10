@@ -2,7 +2,8 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 
 // Der Lernstand liegt als Datei im Projektordner, damit er nicht vom Browser-Speicher abhängt.
-const ORDNER = path.resolve(process.cwd(), 'daten');
+// SPINNEN_DATEN lenkt ihn um, z.B. für eine zweite Instanz zum Ausprobieren, die den echten Stand nicht berührt.
+const ORDNER = path.resolve(process.cwd(), process.env.SPINNEN_DATEN || 'daten');
 const DATEI = path.join(ORDNER, 'lernstand.json');
 const BACKUPS = path.join(ORDNER, 'backup');
 
