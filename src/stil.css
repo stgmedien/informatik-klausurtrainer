@@ -1162,3 +1162,85 @@ figcaption {
     margin-left: 0;
   }
 }
+
+/* KI-Korrektur und Tutor */
+.ki-wartet {
+  display: grid;
+  gap: 10px;
+  color: var(--tinte-2);
+}
+.kreisel {
+  width: 22px;
+  height: 22px;
+  border: 3px solid var(--akzent-hell);
+  border-top-color: var(--akzent);
+  border-radius: 50%;
+  animation: drehen 0.9s linear infinite;
+}
+@keyframes drehen {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .kreisel {
+    animation-duration: 3s;
+  }
+}
+.kriterien.ki li {
+  justify-content: flex-start;
+  align-items: flex-start;
+  flex-wrap: nowrap;
+}
+.urteil-zeichen {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  color: #fff;
+}
+.urteil-zeile.ja .urteil-zeichen {
+  background: var(--gut);
+}
+.urteil-zeile.teil .urteil-zeichen {
+  background: #c98a00;
+}
+.urteil-zeile.nein .urteil-zeichen {
+  background: var(--schlecht);
+}
+.kr-begruendung {
+  display: block;
+  color: var(--tinte-2);
+  font-size: 0.92rem;
+  margin-top: 2px;
+}
+.ki-rueckmeldung {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 8px 16px;
+  margin: 4px 0 12px;
+}
+.ki-rueckmeldung dt {
+  color: var(--tinte-3);
+  font-size: 0.9rem;
+}
+.ki-rueckmeldung dd {
+  margin: 0;
+}
+.ki-rueckmeldung ul {
+  margin: 0 0 4px;
+  padding-left: 1.2em;
+}
+.ki-vermerk {
+  margin-top: 10px;
+}
+.hinweis.tutor {
+  background: var(--akzent-hell);
+  border-left-color: var(--akzent);
+}
+.hinweise .knopfreihe {
+  margin-top: 4px;
+}

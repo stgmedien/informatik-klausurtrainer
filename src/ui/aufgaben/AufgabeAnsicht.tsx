@@ -1,17 +1,28 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { kannItem, operator } from '../../inhalte';
 import type { Aufgabe } from '../../inhalte/typen';
+import { tutorGrunddaten } from '../../lernen/korrektur';
 import { BESTANDEN_AB, heute, verbuche } from '../../lernen/stand';
 import { Markdown } from '../Markdown';
 import { MaterialAnsicht } from '../bausteine/MaterialAnsicht';
 import { punkteText } from '../hilfen';
+import { frageTutor } from '../ki';
 import { useStand } from '../kontext';
+import { Freitext } from './Freitext';
 import { type Abgabe, Auswahl, Luecke, Reihenfolge, Zuordnen } from './einfach';
 import { AuswertungAufgabe, WahrheitstabelleAufgabe } from './logik';
-import { Freitext, KlassenLesen } from './weitere';
+import { KlassenLesen } from './weitere';
 
-function Koerper({ aufgabe, durchgang, fertig, onAbgabe }: { aufgabe: Aufgabe; durchgang: number; fertig: boolean; onAbgabe: (a: Abgabe) => void }) {
-  const gemeinsam = { durchgang, fertig, onAbgabe };
+interface KoerperProps {
+  aufgabe: Aufgabe;
+  durchgang: number;
+  fertig: boolean;
+  onAbgabe: (a: Abgabe) => void;
+  onEntwurf: (text: string) => void;
+}
+
+function Koerper({ aufgabe, durchgang, fertig, onAbgabe, onEntwurf }: KoerperProps) {
+  const gemeinsam = { durchgang, fertig, onAbgabe, onEntwurf };
   switch (aufgabe.typ) {
     case 'auswahl':
       return <Auswahl aufgabe={aufgabe} {...gemeinsam} />;
@@ -41,12 +52,38 @@ interface Props {
 }
 
 export function AufgabeAnsicht({ aufgabe, onWeiter, weiterText = 'Weiter', verbuchen = true }: Props) {
-  const { aendere } = useStand();
+  const { aendere, ki } = useStand();
   const [durchgang, setDurchgang] = useState(0);
-  const [hinweise, setHinweise] = useState(0);
+  // Zahl der aufgedeckten vorformulierten Hinweise (0–3).
+  const [stufen, setStufen] = useState(0);
+  const [tutorHinweise, setTutorHinweise] = useState<string[]>([]);
+  const [tutorLaedt, setTutorLaedt] = useState(false);
+  const [tutorFehler, setTutorFehler] = useState<string | null>(null);
   const [ergebnis, setErgebnis] = useState<Abgabe | null>(null);
+  const entwurf = useRef('');
   const op = operator(aufgabe.operator);
   const fertig = ergebnis !== null;
+  const hinweise = stufen + tutorHinweise.length;
+  // Der Tutor bezieht sich auf einen Entwurf; den gibt es bisher bei Freitextaufgaben.
+  const tutorMoeglich = ki.verfuegbar && aufgabe.typ === 'freitext';
+
+  const tutor = async () => {
+    setTutorLaedt(true);
+    setTutorFehler(null);
+    try {
+      const antwort = await frageTutor({
+        ...tutorGrunddaten(aufgabe),
+        entwurf: entwurf.current,
+        stufe: Math.min(3, tutorHinweise.length + 1) as 1 | 2 | 3,
+        bisherigeHinweise: [...aufgabe.hinweise.slice(0, stufen), ...tutorHinweise],
+      });
+      setTutorHinweise((alt) => [...alt, antwort.hinweis]);
+    } catch (e) {
+      setTutorFehler(e instanceof Error ? e.message : 'Der Tutor ist gerade nicht erreichbar.');
+    } finally {
+      setTutorLaedt(false);
+    }
+  };
 
   const abgabe = (a: Abgabe) => {
     setErgebnis(a);
@@ -70,7 +107,10 @@ export function AufgabeAnsicht({ aufgabe, onWeiter, weiterText = 'Weiter', verbu
 
   const nochmal = () => {
     setErgebnis(null);
-    setHinweise(0);
+    setStufen(0);
+    setTutorHinweise([]);
+    setTutorFehler(null);
+    entwurf.current = '';
     setDurchgang(durchgang + 1);
   };
 
@@ -97,20 +137,46 @@ export function AufgabeAnsicht({ aufgabe, onWeiter, weiterText = 'Weiter', verbu
         <MaterialAnsicht key={i} material={m} />
       ))}
 
-      <Koerper key={durchgang} aufgabe={aufgabe} durchgang={durchgang} fertig={fertig} onAbgabe={abgabe} />
+      <Koerper
+        key={durchgang}
+        aufgabe={aufgabe}
+        durchgang={durchgang}
+        fertig={fertig}
+        onAbgabe={abgabe}
+        onEntwurf={(text) => {
+          entwurf.current = text;
+        }}
+      />
 
       {!fertig && (
         <div className="hinweise">
-          {aufgabe.hinweise.slice(0, hinweise).map((h, i) => (
+          {aufgabe.hinweise.slice(0, stufen).map((h, i) => (
             <p key={i} className="hinweis">
               <strong>Hinweis {i + 1}:</strong> {h}
             </p>
           ))}
-          {hinweise < 3 && (
-            <button className="knopf leise" onClick={() => setHinweise(hinweise + 1)}>
-              {hinweise === 0 ? 'Ich hänge fest – Hinweis zeigen' : `Noch ein Hinweis (${hinweise + 1} von 3)`}
-            </button>
+          {tutorHinweise.map((h, i) => (
+            <p key={`t${i}`} className="hinweis tutor">
+              <strong>Tutor:</strong> {h}
+            </p>
+          ))}
+          {tutorFehler && (
+            <p className="meldung falsch" role="alert">
+              {tutorFehler}
+            </p>
           )}
+          <div className="knopfreihe">
+            {stufen < 3 && (
+              <button className="knopf leise" onClick={() => setStufen(stufen + 1)}>
+                {stufen === 0 ? 'Ich hänge fest – Hinweis zeigen' : `Noch ein Hinweis (${stufen + 1} von 3)`}
+              </button>
+            )}
+            {tutorMoeglich && (
+              <button className="knopf leise" onClick={tutor} disabled={tutorLaedt}>
+                {tutorLaedt ? 'Tutor liest deinen Entwurf …' : 'Tutor zu meinem Entwurf fragen'}
+              </button>
+            )}
+          </div>
         </div>
       )}
 
@@ -118,6 +184,7 @@ export function AufgabeAnsicht({ aufgabe, onWeiter, weiterText = 'Weiter', verbu
         <div className={`ergebnis ${stufe}`} role="status">
           <strong>{punkteText(ergebnis.punkte, ergebnis.max)}</strong>
           {ergebnis.quelle === 'selbst' && <span> · eigene Einschätzung</span>}
+          {ergebnis.quelle === 'ki' && <span> · Einschätzung der KI</span>}
           {hinweise > 0 && quote >= BESTANDEN_AB && <span> · mit Hinweis gelöst: zählt als geübt, noch nicht als sicher</span>}
           {quote < BESTANDEN_AB && <span> · kommt als Wiederholung zurück</span>}
           <div className="ergebnis-ziele">

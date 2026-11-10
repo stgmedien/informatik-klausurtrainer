@@ -1,4 +1,6 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
+import { KiFehler, kiVerfuegbar, modell } from './ki/klient';
+import { gibHinweis, korrigiere } from './ki/rollen';
 import { leseStand, schreibeStand } from './stand';
 
 const MAX_BYTES = 5 * 1024 * 1024;
@@ -23,6 +25,15 @@ async function leseKoerper(req: IncomingMessage): Promise<unknown> {
   return text ? JSON.parse(text) : null;
 }
 
+async function kiRoute(req: IncomingMessage, res: ServerResponse, rolle: (koerper: unknown) => Promise<unknown>): Promise<void> {
+  try {
+    sende(res, 200, await rolle(await leseKoerper(req)));
+  } catch (fehler) {
+    if (fehler instanceof KiFehler) return sende(res, fehler.status, { fehler: fehler.message });
+    throw fehler;
+  }
+}
+
 /** Verteiler für alle /api-Routen. `req.url` ist bereits ohne das Präfix /api. */
 export async function behandle(req: IncomingMessage, res: ServerResponse): Promise<void> {
   const pfad = (req.url ?? '/').split('?')[0];
@@ -38,10 +49,10 @@ export async function behandle(req: IncomingMessage, res: ServerResponse): Promi
     return sende(res, 200, { ok: true });
   }
   if (pfad === '/ki/status' && methode === 'GET') {
-    return sende(res, 200, {
-      verfuegbar: Boolean(process.env.ANTHROPIC_API_KEY),
-      modell: process.env.KI_MODELL || 'claude-opus-5-5',
-    });
+    return sende(res, 200, { verfuegbar: kiVerfuegbar(), modell: modell() });
   }
+  if (pfad === '/ki/korrektur' && methode === 'POST') return kiRoute(req, res, korrigiere);
+  if (pfad === '/ki/tutor' && methode === 'POST') return kiRoute(req, res, gibHinweis);
+
   return sende(res, 404, { fehler: `Unbekannte Route: ${methode} ${pfad}` });
 }
