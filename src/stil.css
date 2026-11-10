@@ -1,0 +1,1164 @@
+:root {
+  color-scheme: light;
+  --papier: #f5f2ea;
+  --flaeche: #ffffff;
+  --flaeche-2: #faf8f3;
+  --tinte: #1c2333;
+  --tinte-2: #4d5568;
+  --tinte-3: #737b8c;
+  --linie: #ddd8cb;
+  --linie-stark: #bdb7a8;
+  --akzent: #27408b;
+  --akzent-hell: #e4eafb;
+  --akzent-dunkel: #1b2e66;
+  --gut: #17713f;
+  --gut-hell: #e2f4e8;
+  --schlecht: #b3261e;
+  --schlecht-hell: #fbe9e7;
+  --mittel: #8a5a00;
+  --mittel-hell: #fdf0cf;
+  --merk: #fffbe6;
+  --merk-linie: #e6d48a;
+  --mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
+  --radius: 10px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--papier);
+  color: var(--tinte);
+  font: 16px/1.55 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  line-height: 1.25;
+  margin: 0 0 0.4em;
+  text-wrap: balance;
+}
+h1 {
+  font-size: 1.7rem;
+  letter-spacing: -0.01em;
+}
+h2 {
+  font-size: 1.3rem;
+}
+h3 {
+  font-size: 1.05rem;
+}
+h4 {
+  font-size: 0.95rem;
+  margin-top: 1.2em;
+}
+p {
+  margin: 0 0 0.8em;
+}
+code,
+.code {
+  font-family: var(--mono);
+  font-size: 0.88em;
+}
+code {
+  background: #eeebe2;
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  white-space: pre-wrap;
+}
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+button:disabled {
+  cursor: default;
+}
+:focus-visible {
+  outline: 2px solid var(--akzent);
+  outline-offset: 2px;
+}
+
+.laden {
+  padding: 3rem;
+  text-align: center;
+  color: var(--tinte-2);
+}
+
+/* ---------- Kopfleiste ---------- */
+.kopfleiste {
+  background: var(--flaeche);
+  border-bottom: 1px solid var(--linie);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.kopf-innen {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-height: 54px;
+  flex-wrap: wrap;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  background: none;
+  font-weight: 700;
+  padding: 6px 4px;
+}
+.logo img {
+  image-rendering: pixelated;
+  border-radius: 4px;
+  background: #ffffc0;
+}
+.hauptnav {
+  display: flex;
+  gap: 2px;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+.hauptnav button {
+  border: 0;
+  background: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: var(--tinte-2);
+}
+.hauptnav button:hover {
+  background: var(--flaeche-2);
+}
+.hauptnav button.aktiv {
+  background: var(--akzent-hell);
+  color: var(--akzent-dunkel);
+  font-weight: 600;
+}
+.speicherfehler {
+  background: var(--schlecht-hell);
+  color: var(--schlecht);
+  text-align: center;
+  padding: 8px 16px;
+  margin: 0;
+}
+
+/* ---------- Seiten und Karten ---------- */
+main {
+  padding: 24px 20px 80px;
+}
+.seite {
+  max-width: 880px;
+  margin: 0 auto;
+}
+.seitenkopf {
+  margin-bottom: 18px;
+}
+.datum {
+  color: var(--tinte-3);
+  margin: 0;
+  font-size: 0.9rem;
+}
+.hinweiszeile {
+  color: var(--mittel);
+  background: var(--mittel-hell);
+  padding: 8px 12px;
+  border-radius: 8px;
+  display: inline-block;
+}
+.datum-eingabe input {
+  font: inherit;
+  padding: 4px 8px;
+  border: 1px solid var(--linie-stark);
+  border-radius: 6px;
+  background: var(--flaeche);
+}
+.karte,
+.aufgabe,
+.lektion {
+  background: var(--flaeche);
+  border: 1px solid var(--linie);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  margin-bottom: 16px;
+}
+.hauptkarte {
+  border-color: var(--akzent);
+  box-shadow: 0 2px 0 var(--akzent);
+  padding: 24px 26px;
+}
+.hauptkarte.ruhig {
+  border-color: var(--linie);
+  box-shadow: none;
+}
+.karten-ueber {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.78rem;
+  color: var(--akzent);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.leise-text {
+  color: var(--tinte-3);
+  font-size: 0.9rem;
+}
+
+/* ---------- Knöpfe, Chips, Marken ---------- */
+.knopf {
+  border: 1px solid var(--linie-stark);
+  background: var(--flaeche);
+  padding: 9px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+.knopf:hover:not(:disabled) {
+  border-color: var(--akzent);
+}
+.knopf.primaer {
+  background: var(--akzent);
+  border-color: var(--akzent);
+  color: #fff;
+}
+.knopf.primaer:hover:not(:disabled) {
+  background: var(--akzent-dunkel);
+}
+.knopf.primaer:disabled {
+  background: #aab2c8;
+  border-color: #aab2c8;
+}
+.knopf.gross {
+  padding: 13px 24px;
+  font-size: 1.05rem;
+}
+.knopf.klein {
+  padding: 5px 11px;
+  font-size: 0.88rem;
+}
+.knopf.leise {
+  background: transparent;
+  color: var(--tinte-2);
+  font-weight: 500;
+}
+.knopf.gefahr {
+  background: var(--schlecht);
+  border-color: var(--schlecht);
+  color: #fff;
+}
+.textknopf {
+  border: 0;
+  background: none;
+  color: var(--akzent);
+  padding: 2px 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.knopfreihe {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.chips {
+  display: inline-flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.chip {
+  border: 1px solid var(--linie-stark);
+  background: var(--flaeche);
+  padding: 4px 11px;
+  border-radius: 999px;
+  font-size: 0.88rem;
+}
+.chip:hover:not(:disabled) {
+  border-color: var(--akzent);
+}
+.chip.an {
+  background: var(--akzent);
+  border-color: var(--akzent);
+  color: #fff;
+}
+.chip.loesung {
+  box-shadow: 0 0 0 2px var(--gut);
+}
+.chip.urteil-ja.an {
+  background: var(--gut);
+  border-color: var(--gut);
+}
+.chip.urteil-teil.an {
+  background: var(--mittel);
+  border-color: var(--mittel);
+}
+.chip.urteil-nein.an {
+  background: var(--schlecht);
+  border-color: var(--schlecht);
+}
+.marke {
+  display: inline-block;
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: #ece9df;
+  color: var(--tinte-2);
+  white-space: nowrap;
+}
+.marke.klausur {
+  background: var(--akzent);
+  color: #fff;
+}
+.marke.eigen {
+  background: var(--gut-hell);
+  color: var(--gut);
+}
+.marke.warnung {
+  background: var(--mittel-hell);
+  color: var(--mittel);
+  white-space: normal;
+}
+.grad-0 {
+  background: #e6e3d9;
+  color: #5b6070;
+}
+.grad-1 {
+  background: #fde7b0;
+  color: #7a4d00;
+}
+.grad-2 {
+  background: #d7e2fb;
+  color: #1f3a8a;
+}
+.grad-3 {
+  background: #c9ebd5;
+  color: #125c33;
+}
+
+/* ---------- Übersicht ---------- */
+.gradbalken {
+  display: flex;
+  height: 14px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #e6e3d9;
+  margin: 6px 0 8px;
+}
+.gradbalken span {
+  flex-basis: 0;
+}
+.gradlegende {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  font-size: 0.88rem;
+  margin-bottom: 8px;
+}
+.punkt {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 3px;
+}
+.einheiten-liste,
+.eintraege,
+.kann-liste,
+.ziel-liste {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.einheit-zeile,
+.eintraege li,
+.kann-liste li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--linie);
+}
+.einheit-zeile:first-child,
+.eintraege li:first-child,
+.kann-liste li:first-child {
+  border-top: 0;
+}
+.einheit-nr {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  background: #e6e3d9;
+  color: var(--tinte-2);
+  flex: none;
+}
+.einheit-zeile.fertig .einheit-nr {
+  background: #c9ebd5;
+  color: #125c33;
+}
+.einheit-zeile.aktuell .einheit-nr {
+  background: var(--akzent);
+  color: #fff;
+}
+.einheit-zeile.gesperrt {
+  opacity: 0.6;
+}
+.einheit-text,
+.eintrag-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.kann-text {
+  flex: 1;
+}
+.bereich-nr {
+  color: var(--akzent);
+  margin-right: 4px;
+}
+.ziel-liste li {
+  padding: 4px 0;
+}
+.filterzeile {
+  margin-top: 10px;
+}
+.seitenkopf .chips {
+  margin-top: 6px;
+}
+
+/* ---------- Einheit ---------- */
+.spieler-kopf {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 10px;
+}
+.spieler-titel {
+  color: var(--tinte-2);
+  font-weight: 600;
+}
+.fortschritt {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.fortschritt-leiste {
+  flex: 1;
+  height: 8px;
+  background: #e6e3d9;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.fortschritt-leiste span {
+  display: block;
+  height: 100%;
+  background: var(--akzent);
+  transition: width 0.25s ease;
+}
+.fortschritt-text {
+  font-size: 0.86rem;
+  color: var(--tinte-2);
+  white-space: nowrap;
+}
+
+/* ---------- Aufgabe ---------- */
+.aufgabe-kopf {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+.marken {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.operator-hinweis {
+  background: var(--akzent-hell);
+  color: var(--akzent-dunkel);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.92rem;
+}
+.stellung {
+  font-size: 1.03rem;
+}
+.hilfstext {
+  color: var(--tinte-3);
+  font-size: 0.9rem;
+  margin: 8px 0;
+}
+.abgabe-leiste {
+  margin-top: 16px;
+}
+.aufgabe-fuss {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--linie);
+  flex-wrap: wrap;
+}
+.hinweise {
+  margin-top: 18px;
+}
+.hinweis {
+  background: var(--mittel-hell);
+  border-left: 4px solid #d9a521;
+  padding: 8px 12px;
+  border-radius: 0 8px 8px 0;
+}
+.ergebnis {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border-left: 5px solid;
+}
+.ergebnis.gut {
+  background: var(--gut-hell);
+  border-color: var(--gut);
+}
+.ergebnis.mittel {
+  background: var(--mittel-hell);
+  border-color: #d9a521;
+}
+.ergebnis.schwach {
+  background: var(--schlecht-hell);
+  border-color: var(--schlecht);
+}
+.ergebnis-ziele {
+  font-size: 0.86rem;
+  color: var(--tinte-2);
+  margin-top: 2px;
+}
+.warum {
+  font-size: 0.92rem;
+  color: var(--tinte-2);
+  margin: 6px 0 0;
+}
+.meldung.falsch {
+  background: var(--schlecht-hell);
+  color: var(--schlecht);
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+.loesung-kasten {
+  background: var(--flaeche-2);
+  border: 1px solid var(--linie);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-top: 14px;
+}
+.loesung-kasten ol,
+.loesung-kasten ul {
+  margin: 6px 0;
+  padding-left: 1.3em;
+}
+.durchgestrichen {
+  text-decoration: line-through;
+  color: var(--schlecht);
+}
+
+/* Auswahl */
+.optionen {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+.option {
+  border: 1px solid var(--linie-stark);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.option label {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  cursor: pointer;
+}
+.option input {
+  margin-top: 5px;
+  flex: none;
+}
+.option .markdown {
+  flex: 1;
+  min-width: 0;
+}
+.option .markdown > :last-child {
+  margin-bottom: 0;
+}
+.option.gewaehlt {
+  border-color: var(--akzent);
+  background: var(--akzent-hell);
+}
+.option.richtig,
+.zuordnen li.richtig,
+.reihenfolge li.richtig,
+.kl-eintrag.richtig {
+  border-color: var(--gut);
+  background: var(--gut-hell);
+}
+.option.falsch,
+.zuordnen li.falsch,
+.reihenfolge li.falsch,
+.kl-eintrag.falsch {
+  border-color: var(--schlecht);
+  background: var(--schlecht-hell);
+}
+
+/* Zuordnen und Reihenfolge */
+.zuordnen,
+.reihenfolge {
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+.zuordnen {
+  list-style: none;
+}
+.zuordnen li,
+.reihenfolge li {
+  border: 1px solid var(--linie);
+  border-radius: 8px;
+  padding: 9px 12px;
+}
+.zuordnen li {
+  display: grid;
+  gap: 6px;
+}
+.zu-text {
+  font-weight: 500;
+}
+.zu-text.code {
+  font-weight: 400;
+}
+.reihenfolge {
+  list-style: none;
+  counter-reset: rf;
+}
+.reihenfolge li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  counter-increment: rf;
+}
+.reihenfolge li::before {
+  content: counter(rf) '.';
+  font-weight: 700;
+  color: var(--tinte-3);
+  width: 1.4em;
+}
+.rf-text {
+  flex: 1;
+}
+.rf-knoepfe {
+  display: flex;
+  gap: 4px;
+}
+.mini {
+  border: 1px solid var(--linie-stark);
+  background: var(--flaeche);
+  border-radius: 6px;
+  width: 32px;
+  height: 30px;
+  font-size: 0.8rem;
+}
+.mini:disabled {
+  opacity: 0.35;
+}
+
+/* Lücken */
+.luecken {
+  line-height: 2.3;
+  background: var(--flaeche-2);
+  border: 1px solid var(--linie);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+.luecken.code {
+  white-space: pre-wrap;
+  line-height: 2;
+  overflow-x: auto;
+}
+.luecke {
+  font: inherit;
+  font-family: var(--mono);
+  font-size: 0.88em;
+  border: 0;
+  border-bottom: 2px solid var(--akzent);
+  background: var(--akzent-hell);
+  padding: 2px 6px;
+  border-radius: 4px 4px 0 0;
+  margin: 0 2px;
+}
+.luecke.richtig {
+  background: var(--gut-hell);
+  border-color: var(--gut);
+  color: var(--gut);
+}
+.luecke.falsch {
+  background: var(--schlecht-hell);
+  border-color: var(--schlecht);
+  color: var(--schlecht);
+}
+
+/* Logik */
+.formel {
+  font-family: var(--mono);
+  font-size: 1.05rem;
+  background: var(--flaeche-2);
+  border: 1px solid var(--linie);
+  border-radius: 8px;
+  padding: 8px 14px;
+  display: inline-block;
+}
+.wahrheitstabelle {
+  border-collapse: collapse;
+  margin: 8px 0;
+}
+.wahrheitstabelle th,
+.wahrheitstabelle td {
+  border: 1px solid var(--linie-stark);
+  padding: 7px 16px;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 0.92rem;
+}
+.wahrheitstabelle th {
+  background: var(--flaeche-2);
+  font-family: inherit;
+}
+.wahrheitstabelle .ergebnis-spalte {
+  border-left: 3px double var(--tinte-2);
+}
+.wahrheitstabelle tr.richtig td.ergebnis-spalte {
+  background: var(--gut-hell);
+}
+.wahrheitstabelle tr.falsch td.ergebnis-spalte {
+  background: var(--schlecht-hell);
+}
+.umschalter {
+  display: inline-flex;
+  gap: 6px;
+  margin-left: 6px;
+}
+.umschalter .chip {
+  font-family: var(--mono);
+  min-width: 44px;
+}
+.angaben {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 4px 14px;
+  margin: 8px 0 12px;
+}
+.angaben dt {
+  color: var(--tinte-3);
+}
+.angaben dd {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.92rem;
+}
+.rechenweg {
+  background: #fffef8;
+  border: 1px solid var(--linie);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-family: var(--mono);
+  font-size: 1.02rem;
+  overflow-x: auto;
+  background-image: linear-gradient(#e9eefb 1px, transparent 1px);
+  background-size: 100% 2.4em;
+  background-position: 0 2.25em;
+}
+.rw-zeile {
+  min-height: 2.4em;
+  display: flex;
+  align-items: center;
+  gap: 0.5ch;
+  white-space: pre;
+}
+.rw-zeile.alt {
+  color: var(--tinte-3);
+}
+.rw-zeile.schluss {
+  font-weight: 700;
+  color: var(--gut);
+}
+.op {
+  font-family: var(--mono);
+  border: 1px solid var(--akzent);
+  background: var(--akzent-hell);
+  color: var(--akzent-dunkel);
+  border-radius: 6px;
+  padding: 1px 8px;
+  font-weight: 700;
+}
+.op:hover {
+  background: var(--akzent);
+  color: #fff;
+}
+.op.an {
+  background: var(--akzent);
+  color: #fff;
+}
+.frage {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.musterweg {
+  border-collapse: collapse;
+  margin-top: 6px;
+}
+.musterweg td {
+  padding: 3px 14px 3px 0;
+  vertical-align: top;
+}
+.musterweg td:last-child {
+  color: var(--tinte-3);
+  font-size: 0.88rem;
+}
+
+/* Klassendiagramm */
+.diagramm-rahmen {
+  overflow-x: auto;
+  padding: 10px;
+  background: var(--flaeche-2);
+  border: 1px solid var(--linie);
+  border-radius: 8px;
+  margin: 10px 0;
+}
+.klassendiagramm {
+  display: block;
+  margin: 0 auto;
+  max-width: none;
+}
+.klassendiagramm text {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  fill: var(--tinte);
+}
+.klassendiagramm .kd-name {
+  font-weight: 700;
+  font-size: 13.5px;
+}
+.kd-kasten rect {
+  fill: #fff;
+  stroke: var(--tinte);
+  stroke-width: 1.3;
+}
+.kd-kasten line {
+  stroke: var(--tinte);
+  stroke-width: 1.1;
+}
+.kd-markiert rect {
+  stroke: var(--akzent);
+  stroke-width: 2.6;
+  fill: #f3f6ff;
+}
+.kd-pfeil path {
+  fill: none;
+  stroke: var(--tinte);
+  stroke-width: 1.3;
+}
+.kd-pfeil polygon {
+  fill: var(--flaeche-2);
+  stroke: var(--tinte);
+  stroke-width: 1.3;
+}
+.kl-gruppen {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+.kl-gruppe {
+  border: 1px solid var(--linie);
+  border-radius: 8px;
+  padding: 8px 12px 12px;
+  margin: 0;
+  display: grid;
+  gap: 6px;
+}
+.kl-gruppe legend {
+  font-weight: 600;
+  padding: 0 6px;
+}
+.kl-eintrag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 3px 6px;
+  cursor: pointer;
+}
+.kl-herkunft {
+  margin-left: auto;
+  font-size: 0.82rem;
+  color: var(--tinte-2);
+}
+
+/* Objektdiagramm */
+.material,
+.code-figur {
+  margin: 12px 0;
+}
+figcaption {
+  font-size: 0.86rem;
+  color: var(--tinte-3);
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+.objektkarten {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.objektkarte {
+  border-collapse: collapse;
+  background: #fff;
+  font-family: var(--mono);
+  font-size: 0.88rem;
+}
+.objektkarte caption {
+  border: 1.3px solid var(--tinte);
+  border-bottom: 0;
+  padding: 6px 14px;
+  font-weight: 700;
+  background: #fff;
+}
+.unterstrichen {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.objektkarte td {
+  border: 1.3px solid var(--tinte);
+  padding: 4px 14px;
+}
+
+/* Quelltext */
+.codeblock,
+.code-ansicht {
+  font-family: var(--mono);
+  font-size: 0.88rem;
+  line-height: 1.6;
+  background: #fbfaf6;
+  border: 1px solid var(--linie);
+  border-radius: 8px;
+  overflow-x: auto;
+}
+.codeblock {
+  padding: 10px 14px;
+  margin: 0 0 0.8em;
+  white-space: pre;
+}
+.code-ansicht {
+  padding: 8px 0;
+}
+.code-zeile {
+  display: flex;
+  white-space: pre;
+  padding-right: 14px;
+}
+.code-zeile.aktiv {
+  background: #fff3bf;
+}
+.code-nr {
+  width: 3em;
+  flex: none;
+  text-align: right;
+  padding-right: 12px;
+  color: #a9a493;
+  user-select: none;
+}
+
+/* Freitext */
+.freitext,
+.merksatz-bearbeiten textarea {
+  width: 100%;
+  font: inherit;
+  line-height: 1.6;
+  padding: 12px 14px;
+  border: 1px solid var(--linie-stark);
+  border-radius: 8px;
+  background: #fffef8;
+  resize: vertical;
+}
+.spalten {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+.spalten h4 {
+  margin-top: 0;
+}
+.eigene-antwort,
+.musterantwort {
+  white-space: pre-wrap;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin: 0;
+  border: 1px solid var(--linie);
+}
+.eigene-antwort {
+  background: #fffef8;
+}
+.musterantwort {
+  background: var(--gut-hell);
+  border-color: #b5dcc3;
+}
+.kriterien {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px;
+}
+.kriterien li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 0;
+  border-top: 1px solid var(--linie);
+  flex-wrap: wrap;
+}
+.kr-text {
+  flex: 1;
+  min-width: 240px;
+}
+.kr-punkte {
+  color: var(--tinte-3);
+  font-size: 0.86rem;
+}
+.fachbegriff {
+  display: inline-block;
+  margin: 2px 4px 2px 0;
+  padding: 1px 9px;
+  border-radius: 999px;
+  background: #ece9df;
+  color: var(--tinte-2);
+  font-size: 0.86rem;
+}
+.fachbegriff.drin {
+  background: var(--gut-hell);
+  color: var(--gut);
+}
+
+/* Lektion */
+.merksatz {
+  background: var(--merk);
+  border: 1px solid var(--merk-linie);
+  border-left: 5px solid #d9b93a;
+  border-radius: 0 8px 8px 0;
+  padding: 10px 14px;
+  margin: 12px 0;
+}
+.merksatz.abgleichen {
+  border-left-color: #d9861f;
+}
+.merksatz p {
+  margin: 4px 0 6px;
+}
+.merksatz-kopf {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.merksatz-fuss {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 0.82rem;
+}
+.merksatz-fuss .textknopf {
+  font-size: 0.82rem;
+}
+.quelle {
+  color: var(--tinte-3);
+}
+.merksatz-bearbeiten {
+  margin: 6px 0;
+}
+.heft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--tinte-2);
+  font-size: 0.92rem;
+}
+.abschluss-punkte {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+/* Markdown */
+.markdown > :last-child {
+  margin-bottom: 0.8em;
+}
+.markdown ul,
+.markdown ol {
+  margin: 0 0 0.8em;
+  padding-left: 1.4em;
+}
+.markdown li {
+  margin-bottom: 0.25em;
+}
+.tabelle-rahmen {
+  overflow-x: auto;
+  margin: 0 0 0.9em;
+}
+.md-tabelle {
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  min-width: 60%;
+}
+.md-tabelle th,
+.md-tabelle td {
+  border: 1px solid var(--linie-stark);
+  padding: 6px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+.md-tabelle th {
+  background: var(--flaeche-2);
+}
+.md-tabelle code {
+  white-space: pre;
+}
+
+@media (max-width: 640px) {
+  main {
+    padding: 14px 12px 60px;
+  }
+  .karte,
+  .aufgabe,
+  .lektion {
+    padding: 16px 14px;
+  }
+  .hauptnav {
+    margin-left: 0;
+  }
+}
