@@ -9,6 +9,7 @@ import { punkteText } from '../hilfen';
 import { frageTutor } from '../ki';
 import { useStand } from '../kontext';
 import { Freitext } from './Freitext';
+import { Vorhersage } from './Vorhersage';
 import { type Abgabe, Auswahl, Luecke, Reihenfolge, Zuordnen } from './einfach';
 import { AuswertungAufgabe, WahrheitstabelleAufgabe } from './logik';
 import { KlassenLesen } from './weitere';
@@ -40,6 +41,8 @@ function Koerper({ aufgabe, durchgang, fertig, onAbgabe, onEntwurf }: KoerperPro
       return <KlassenLesen aufgabe={aufgabe} {...gemeinsam} />;
     case 'freitext':
       return <Freitext aufgabe={aufgabe} {...gemeinsam} />;
+    case 'vorhersage':
+      return <Vorhersage aufgabe={aufgabe} {...gemeinsam} />;
   }
 }
 

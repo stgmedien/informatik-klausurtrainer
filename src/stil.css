@@ -1244,3 +1244,335 @@ figcaption {
 .hinweise .knopfreihe {
   margin-top: 4px;
 }
+
+/* ---------- Spinnenwelt ---------- */
+.welt-rahmen {
+  overflow-x: auto;
+  max-width: 100%;
+}
+.welt {
+  display: grid;
+  background: #ffffc0;
+  border: 1px solid var(--linie-stark);
+  image-rendering: pixelated;
+}
+.feld {
+  position: relative;
+  aspect-ratio: 1;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: url('/bilder/bodenplatte.png') center / 100% 100%;
+}
+.feld img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+.feld img.spinne {
+  transition: transform 0.15s ease;
+}
+.feld.waehlbar {
+  cursor: pointer;
+}
+.feld.waehlbar:hover {
+  outline: 2px solid var(--akzent);
+  outline-offset: -2px;
+  z-index: 1;
+}
+.feld.markiert {
+  outline: 3px solid var(--akzent);
+  outline-offset: -3px;
+  z-index: 2;
+  background-color: rgba(39, 64, 139, 0.18);
+  background-blend-mode: multiply;
+}
+.feld.ziel {
+  box-shadow: inset 0 0 0 3px var(--gut);
+  z-index: 2;
+}
+.fliegen-zahl {
+  position: absolute;
+  right: 1px;
+  bottom: 0;
+  font: 700 11px/1 var(--mono);
+  color: #fff;
+  background: var(--tinte);
+  border-radius: 3px;
+  padding: 1px 3px;
+  z-index: 3;
+}
+.konsole {
+  margin-top: 8px;
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  background: #1c2333;
+  color: #f2f2f2;
+  border-radius: 6px;
+  padding: 6px 10px;
+  min-height: 2.2em;
+}
+.konsole .leise-text {
+  color: #9aa3b5;
+}
+
+/* ---------- Stepper ---------- */
+.stepper {
+  margin-top: 16px;
+  border: 1px solid var(--linie);
+  border-radius: var(--radius);
+  padding: 14px;
+  background: var(--flaeche-2);
+}
+.stepper h4 {
+  margin-top: 0;
+}
+.stepper-flaeche {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+@media (max-width: 760px) {
+  .stepper-flaeche {
+    grid-template-columns: 1fr;
+  }
+}
+.stepper-code .code-figur {
+  margin: 0;
+}
+.stepper-code .code-ansicht {
+  max-height: 420px;
+  overflow: auto;
+}
+.stepper-text {
+  margin: 12px 0 8px;
+  padding: 8px 12px;
+  background: #fff;
+  border: 1px solid var(--linie);
+  border-radius: 8px;
+  font-family: var(--mono);
+  font-size: 0.9rem;
+  min-height: 2.4em;
+}
+.stepper-text.warnung {
+  background: var(--schlecht-hell);
+  border-color: #e7b3ae;
+  color: var(--schlecht);
+  font-family: inherit;
+}
+.stepper-leiste {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.mini.breit {
+  width: 38px;
+}
+.tempo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  font-size: 0.86rem;
+  color: var(--tinte-2);
+}
+.variablen {
+  border-collapse: collapse;
+  margin-top: 10px;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  background: #fff;
+}
+.variablen caption {
+  text-align: left;
+  font-family: inherit;
+  font-size: 0.82rem;
+  color: var(--tinte-3);
+  font-weight: 600;
+  padding-bottom: 2px;
+}
+.variablen td {
+  border: 1px solid var(--linie-stark);
+  padding: 3px 10px;
+}
+
+/* ---------- Vorhersage ---------- */
+.vorhersage-material {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+@media (max-width: 760px) {
+  .vorhersage-material {
+    grid-template-columns: 1fr;
+  }
+}
+.vorhersage-fragen {
+  display: grid;
+  gap: 8px;
+  margin-top: 6px;
+}
+.vf {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  border: 1px solid var(--linie);
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+.vf.richtig {
+  border-color: var(--gut);
+  background: var(--gut-hell);
+}
+.vf.falsch {
+  border-color: var(--schlecht);
+  background: var(--schlecht-hell);
+}
+.vf-frage {
+  font-weight: 600;
+  min-width: 190px;
+}
+.vf-loesung {
+  font-size: 0.9rem;
+  color: var(--tinte-2);
+  margin-left: auto;
+}
+.chips.spalte {
+  flex-direction: column;
+  align-items: flex-start;
+}
+.zahl {
+  font: inherit;
+  width: 5em;
+  padding: 4px 8px;
+  border: 1px solid var(--linie-stark);
+  border-radius: 6px;
+}
+.erklaerung {
+  margin-top: 14px;
+  background: var(--akzent-hell);
+  border-radius: 8px;
+  padding: 10px 14px 2px;
+}
+
+/* ---------- Diagnosen ---------- */
+.diagnosen {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0;
+  display: grid;
+  gap: 6px;
+}
+.diagnose {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  border: 1px solid var(--linie);
+  border-left: 4px solid var(--linie-stark);
+  border-radius: 6px;
+  padding: 8px 10px;
+  background: #fff;
+}
+.diagnose.fehler,
+.diagnose.nicht-unterstuetzt {
+  border-left-color: var(--schlecht);
+}
+.diagnose.warnung {
+  border-left-color: #d9a521;
+}
+.diagnose-zeile {
+  border: 0;
+  background: var(--flaeche-2);
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+.diagnose-inhalt {
+  display: grid;
+  gap: 3px;
+}
+.javac {
+  font-size: 0.84rem;
+  color: var(--tinte-3);
+}
+.diagnose-tipp {
+  font-size: 0.88rem;
+  color: var(--tinte-2);
+}
+
+/* ---------- Werkstatt und Code-Eingabe ---------- */
+.seite.breit {
+  max-width: 1120px;
+}
+.werkstatt {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 16px;
+}
+@media (max-width: 860px) {
+  .werkstatt {
+    grid-template-columns: 1fr;
+  }
+}
+.code-eingabe,
+.karte-text {
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  padding: 10px 12px;
+  border: 1px solid var(--linie-stark);
+  border-radius: 8px;
+  background: #fffef8;
+  tab-size: 4;
+  resize: vertical;
+  white-space: pre;
+  overflow-x: auto;
+}
+.code-eingabe:disabled {
+  background: var(--flaeche-2);
+  color: var(--tinte-2);
+}
+.feldzeile {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 12px 8px 0;
+}
+.feldzeile select {
+  font: inherit;
+  padding: 4px 8px;
+  border: 1px solid var(--linie-stark);
+  border-radius: 6px;
+  background: var(--flaeche);
+  max-width: 100%;
+}
+.start-leiste {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+.karten-editor {
+  margin-top: 10px;
+}
+.karten-editor summary {
+  cursor: pointer;
+  color: var(--akzent);
+}
+.ok-zeile {
+  color: var(--gut);
+  font-weight: 600;
+  margin: 8px 0;
+}
+.rueckgabe {
+  margin-top: 10px;
+}

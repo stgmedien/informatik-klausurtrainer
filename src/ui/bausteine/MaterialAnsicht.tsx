@@ -1,6 +1,8 @@
 import type { Material, ObjektKarte } from '../../inhalte/typen';
+import { baueWelt } from '../../lernen/ausfuehren';
 import { Markdown } from '../Markdown';
 import { KlassenDiagramm } from './KlassenDiagramm';
+import { WeltAnsicht } from './WeltAnsicht';
 
 export function CodeAnsicht({ quelltext, titel, markierteZeile }: { quelltext: string; titel?: string; markierteZeile?: number }) {
   const zeilen = quelltext.split('\n');
@@ -57,6 +59,13 @@ export function MaterialAnsicht({ material }: { material: Material }) {
         <figure className="material">
           {material.titel && <figcaption>{material.titel}</figcaption>}
           <ObjektKarten objekte={material.objekte} />
+        </figure>
+      );
+    case 'welt':
+      return (
+        <figure className="material">
+          {material.titel && <figcaption>{material.titel}</figcaption>}
+          <WeltAnsicht welt={baueWelt(material.welt)} />
         </figure>
       );
     case 'code':

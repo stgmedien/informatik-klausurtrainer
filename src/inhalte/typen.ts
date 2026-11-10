@@ -24,8 +24,30 @@ export interface ObjektKarte {
   attribute: [name: string, wert: string][];
 }
 
+/** Welt als Textkarte: # Hindernis, . leer, K Klatsche, F Fliege (2–9 mehrere), > v < ^ Tarantel mit Blickrichtung. */
+export interface WeltAngabe {
+  karte: string;
+  /** Fliegen, die die Tarantel zu Beginn schon gefressen hat. */
+  gefressen?: number;
+  /** Fliegen auf dem Startfeld der Tarantel. */
+  fliegenUnterSpinne?: number;
+}
+
+export type VorhersageFrage = 'feld' | 'richtung' | 'gefressen' | 'meldung' | 'endet';
+
+/** Erwartete Antworten einer Vorhersage – als Gegenprobe; maßgeblich ist der tatsächliche Programmlauf. */
+export interface VorhersageLoesung {
+  feld?: [x: number, y: number];
+  richtung?: 0 | 90 | 180 | 270;
+  gefressen?: number;
+  /** null = keine Meldung in der Konsole. */
+  meldung?: string | null;
+  endet?: boolean;
+}
+
 export type Material =
   | { art: 'klassendiagramm'; modell: KlassenModell; titel?: string }
+  | { art: 'welt'; welt: WeltAngabe; titel?: string }
   | { art: 'objekte'; objekte: ObjektKarte[]; titel?: string }
   | { art: 'code'; quelltext: string; titel?: string }
   | { art: 'text'; markdown: string };
@@ -76,6 +98,17 @@ export type Aufgabe = AufgabeBasis &
       }
     | { typ: 'auswertung'; ausdruck: string; belegung: Belegung; notation: Notation }
     | { typ: 'klassen-lesen'; modell: KlassenModell; objektDerKlasse: string; gesucht: 'attribute' | 'methoden' | 'beides' }
+    | {
+        typ: 'vorhersage';
+        quelltext: string;
+        methode: string;
+        welt: WeltAngabe;
+        /** Wonach gefragt wird. Die Lösung wird durch Ausführen des Quelltexts berechnet. */
+        fragen: VorhersageFrage[];
+        erwartet: VorhersageLoesung;
+        /** Erscheint nach der Abgabe neben dem Programmlauf. */
+        erklaerung: string;
+      }
   );
 
 export type AufgabenTyp = Aufgabe['typ'];

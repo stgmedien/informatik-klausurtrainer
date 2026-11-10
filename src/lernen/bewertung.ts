@@ -1,7 +1,8 @@
 // Automatische Bewertung der Aufgabentypen, bei denen sich die Lösung berechnen lässt.
 import { besitz } from '../engine/klassen';
 import { parseLogik, wahrheitstabelle } from '../engine/logik';
-import type { Aufgabe } from '../inhalte/typen';
+import type { Aufgabe, VorhersageFrage, VorhersageLoesung } from '../inhalte/typen';
+import { type Ausfuehrung, starte } from './ausfuehren';
 
 export interface Bewertung {
   punkte: number;
@@ -97,4 +98,44 @@ export function bewerteKlassenLesen(a: Von<'klassen-lesen'>, gewaehlt: ReadonlyS
   const eintraege = eintraegeKlassenLesen(a);
   const treffer = eintraege.filter((e) => gewaehlt.has(`${e.art}:${e.name}`) === e.besitzt).length;
   return anteil(treffer, eintraege.length, a.punkte);
+}
+
+export interface VorhersageAntwort {
+  feld?: { x: number; y: number };
+  richtung?: number;
+  gefressen?: number;
+  /** null = keine Meldung. */
+  meldung?: string | null;
+  endet?: boolean;
+}
+
+/** Führt den Quelltext der Aufgabe aus und liest die Lösung am Endzustand ab. */
+export function loeseVorhersage(a: Von<'vorhersage'>): { ausfuehrung: Ausfuehrung; loesung: Required<VorhersageLoesung> } {
+  const ausfuehrung = starte(a.quelltext, a.methode, a.welt);
+  const { endwelt, konsole, ende } = ausfuehrung.lauf;
+  return {
+    ausfuehrung,
+    loesung: {
+      feld: [endwelt.spinne.x, endwelt.spinne.y],
+      richtung: endwelt.spinne.richtung,
+      gefressen: endwelt.spinne.gefressen,
+      meldung: konsole[0] ?? null,
+      endet: ende.grund === 'fertig',
+    },
+  };
+}
+
+export function pruefeVorhersage(antwort: VorhersageAntwort, loesung: Required<VorhersageLoesung>): Record<VorhersageFrage, boolean> {
+  return {
+    feld: antwort.feld?.x === loesung.feld[0] && antwort.feld?.y === loesung.feld[1],
+    richtung: antwort.richtung === loesung.richtung,
+    gefressen: antwort.gefressen === loesung.gefressen,
+    meldung: antwort.meldung !== undefined && antwort.meldung === loesung.meldung,
+    endet: antwort.endet === loesung.endet,
+  };
+}
+
+export function bewerteVorhersage(a: Von<'vorhersage'>, antwort: VorhersageAntwort): Bewertung {
+  const richtig = pruefeVorhersage(antwort, loeseVorhersage(a).loesung);
+  return anteil(a.fragen.filter((f) => richtig[f]).length, a.fragen.length, a.punkte);
 }

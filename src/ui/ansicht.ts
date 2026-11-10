@@ -10,6 +10,7 @@ export type Ansicht =
   | { seite: 'aufgabe'; id: string; zurueck: Ansicht }
   | { seite: 'lektion'; id: string; zurueck: Ansicht }
   | { seite: 'logik'; modus: 'auswertung' | 'tabelle'; stufe: 1 | 2 | 3; zurueck: Ansicht }
+  | { seite: 'werkstatt' }
   | { seite: 'spick' }
   | { seite: 'einstellungen' };
 

@@ -15,6 +15,8 @@ export function materialAlsText(material: Material[] | undefined): string | unde
           return `Quelltext${m.titel ? ` (${m.titel})` : ''}:\n${m.quelltext}`;
         case 'text':
           return m.markdown;
+        case 'welt':
+          return `Welt${m.titel ? ` (${m.titel})` : ''} als Karte (# Hindernis, . leer, K Klatsche, F Fliege, > v < ^ Tarantel mit Blickrichtung):\n${m.welt.karte.trim()}`;
         case 'objekte':
           return m.objekte.map((o) => `Objekt ${o.name} : ${o.klasse} – ${o.attribute.map(([n, w]) => `${n} = ${w}`).join(', ')}`).join('\n');
         case 'klassendiagramm':

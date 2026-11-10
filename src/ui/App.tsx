@@ -8,11 +8,13 @@ import { useStand } from './kontext';
 import { EinheitSpieler, Heute, Wiederholung } from './seiten/Heute';
 import { Kannliste, Ueben } from './seiten/Lernen';
 import { Einstellungen, Spickzettel } from './seiten/Rest';
+import { Werkstatt } from './seiten/Werkstatt';
 
 const NAVIGATION: { ansicht: Ansicht; titel: string }[] = [
   { ansicht: { seite: 'heute' }, titel: 'Heute' },
   { ansicht: { seite: 'kann' }, titel: 'Kann-Liste' },
   { ansicht: { seite: 'ueben' }, titel: 'Üben' },
+  { ansicht: { seite: 'werkstatt' }, titel: 'Werkstatt' },
   { ansicht: { seite: 'spick' }, titel: 'Spickzettel' },
   { ansicht: { seite: 'einstellungen' }, titel: 'Einstellungen' },
 ];
@@ -98,6 +100,9 @@ export function App() {
       );
       break;
     }
+    case 'werkstatt':
+      inhalt = <Werkstatt />;
+      break;
     case 'spick':
       inhalt = <Spickzettel />;
       break;
