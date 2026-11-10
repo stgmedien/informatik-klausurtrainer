@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react';
 import { MELDUNG_GEKLATSCHT, MELDUNG_HINDERNIS, MELDUNG_KEINE_FLIEGE, MELDUNG_NICHTS_GEFRESSEN } from '../../engine/welt';
 import type { VorhersageFrage } from '../../inhalte/typen';
-import { baueWelt, richtungsName } from '../../lernen/ausfuehren';
+import { baueWelt, richtungsName, uebersetze } from '../../lernen/ausfuehren';
 import { type VorhersageAntwort, loeseVorhersage, pruefeVorhersage } from '../../lernen/bewertung';
 import { Markdown } from '../Markdown';
 import { CodeAnsicht } from '../bausteine/MaterialAnsicht';
 import { Stepper } from '../bausteine/Stepper';
+import { StruktogrammAnsicht } from '../bausteine/StruktogrammAnsicht';
 import { WeltAnsicht } from '../bausteine/WeltAnsicht';
 import { AbgabeKnopf, type TeilProps } from './einfach';
 
@@ -23,6 +24,8 @@ const RICHTUNGEN = [
  */
 export function Vorhersage({ aufgabe, fertig, onAbgabe }: TeilProps<'vorhersage'>) {
   const start = useMemo(() => baueWelt(aufgabe.welt), [aufgabe]);
+  const alsStrukto = aufgabe.darstellung === 'struktogramm';
+  const programm = useMemo(() => (alsStrukto ? uebersetze(aufgabe.quelltext).programm : null), [aufgabe, alsStrukto]);
   const [antwort, setAntwort] = useState<VorhersageAntwort>({});
   const [geloest, setGeloest] = useState<ReturnType<typeof loeseVorhersage> | null>(null);
   const fragt = (f: VorhersageFrage) => aufgabe.fragen.includes(f);
@@ -52,7 +55,14 @@ export function Vorhersage({ aufgabe, fertig, onAbgabe }: TeilProps<'vorhersage'
   return (
     <div className="vorhersage">
       <div className="vorhersage-material">
-        <CodeAnsicht quelltext={aufgabe.quelltext} titel={`Aufgerufen wird ${aufgabe.methode}()`} />
+        {programm ? (
+          <figure className="material">
+            <figcaption>Struktogramm</figcaption>
+            <StruktogrammAnsicht programm={programm} methode={aufgabe.methode} mitHilfsmethoden />
+          </figure>
+        ) : (
+          <CodeAnsicht quelltext={aufgabe.quelltext} titel={`Aufgerufen wird ${aufgabe.methode}()`} />
+        )}
         <figure className="material">
           <figcaption>Ausgangslage{fragt('feld') && !fertig ? ' – klicke das Feld an, auf dem die Tarantel am Ende steht' : ''}</figcaption>
           <WeltAnsicht welt={start} markiert={antwort.feld} onFeld={fragt('feld') && !fertig ? (x, y) => setze({ feld: { x, y } }) : undefined} />
@@ -134,7 +144,15 @@ export function Vorhersage({ aufgabe, fertig, onAbgabe }: TeilProps<'vorhersage'
       {geloest && (
         <>
           <Markdown text={aufgabe.erklaerung} klasse="erklaerung" />
-          <Stepper programm={geloest.ausfuehrung.programm} lauf={geloest.ausfuehrung.lauf} start={geloest.ausfuehrung.start} autoStart markiert={antwort.feld} titel="So läuft das Programm tatsächlich ab" />
+          <Stepper
+            programm={geloest.ausfuehrung.programm}
+            lauf={geloest.ausfuehrung.lauf}
+            start={geloest.ausfuehrung.start}
+            autoStart
+            markiert={antwort.feld}
+            titel="So läuft das Programm tatsächlich ab"
+            struktogramm={alsStrukto ? { methode: aufgabe.methode, mitHilfsmethoden: true } : undefined}
+          />
         </>
       )}
     </div>

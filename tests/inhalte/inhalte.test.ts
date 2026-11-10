@@ -3,6 +3,7 @@ import { besitz, pruefeModell } from '../../src/engine/klassen';
 import { parseLogik, variablen } from '../../src/engine/logik';
 import { AUFGABEN, EINHEITEN, KANNLISTE, LEKTIONEN, OPERATOREN, alleMerksaetze, aufgabe, lektion } from '../../src/inhalte';
 import type { Material } from '../../src/inhalte';
+import { baueWelt, uebersetze } from '../../src/lernen/ausfuehren';
 import { eintraegeKlassenLesen, loesungTabelle } from '../../src/lernen/bewertung';
 
 const kannIds = new Set(KANNLISTE.map((k) => k.id));
@@ -62,6 +63,12 @@ describe('Formales je Aufgabe', () => {
           expect(new Set(a.elemente).size).toBe(a.elemente.length);
           expect(a.elemente.length).toBeGreaterThan(2);
           break;
+        case 'klassen-modellieren': {
+          const summe = a.erwartung.kriterien.reduce((s, k) => s + k.punkte, 0);
+          expect(summe, 'Punktsumme des Erwartungshorizonts').toBe(a.punkte);
+          expect(a.pflichtklassen.length).toBeGreaterThan(1);
+          break;
+        }
         case 'freitext': {
           const summe = a.erwartung.kriterien.reduce((s, k) => s + k.punkte, 0);
           expect(summe, 'Punktsumme des Erwartungshorizonts').toBe(a.punkte);
@@ -110,6 +117,12 @@ function pruefeMaterial(m: Material): void {
   if (m.art === 'klassendiagramm') expect(pruefeModell(m.modell)).toEqual([]);
   if (m.art === 'objekte') for (const o of m.objekte) expect(o.attribute.length).toBeGreaterThan(0);
   if (m.art === 'code') expect(m.quelltext.trim().length).toBeGreaterThan(0);
+  if (m.art === 'struktogramm') {
+    const p = uebersetze(m.quelltext).programm;
+    expect(p, 'Struktogramm-Quelltext ist gültig').not.toBeNull();
+    expect(p!.klasse.methoden.some((x) => x.name === m.methode)).toBe(true);
+  }
+  if (m.art === 'welt') expect(() => baueWelt(m.welt)).not.toThrow();
 }
 
 describe('Lektionen', () => {
@@ -126,7 +139,7 @@ describe('Lektionen', () => {
 
 describe('Abdeckung der Kann-Liste', () => {
   // Diese Lernziele kommen erst mit späteren Ausbaustufen (Spinnenwelt, Struktogramme, Modellierung).
-  const spaeter = new Set(['k1-modellieren', 'k25-lesen', 'k25-schreiben', 'k25-einruecken', 'k26-lesen', 'k26-modellieren', 'k26-ueberfuehren']);
+  const spaeter = new Set<string>();
 
   it('hat zu jedem bereits abgedeckten Lernziel mindestens eine Lektion und zwei Aufgaben', () => {
     for (const k of KANNLISTE) {

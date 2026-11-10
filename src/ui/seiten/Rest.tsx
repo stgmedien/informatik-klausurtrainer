@@ -84,6 +84,27 @@ export function Einstellungen() {
         </label>
       </section>
       <section className="karte">
+        <h3>Struktogramme</h3>
+        <p>Beschriftung der Verzweigung:</p>
+        <div className="chips">
+          {(
+            [
+              ['wahr-falsch', 'Wahr / Falsch (Arbeitsblatt)'],
+              ['ja-nein', 'Ja / Nein (Video)'],
+            ] as const
+          ).map(([wert, name]) => (
+            <button
+              key={wert}
+              className={`chip${(stand.struktoBeschriftung ?? 'wahr-falsch') === wert ? ' an' : ''}`}
+              aria-pressed={(stand.struktoBeschriftung ?? 'wahr-falsch') === wert}
+              onClick={() => aendere((s) => ({ ...s, struktoBeschriftung: wert }))}
+            >
+              {name}
+            </button>
+          ))}
+        </div>
+      </section>
+      <section className="karte">
         <h3>KI-Unterstützung</h3>
         {ki.verfuegbar ? (
           <p>

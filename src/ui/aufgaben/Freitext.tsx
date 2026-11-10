@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 import type { KorrekturErgebnis, Urteil as KiUrteil } from '../../../server/ki/typen';
+import type { Aufgabe, Erwartungshorizont } from '../../inhalte/typen';
 import { baueKorrekturAnfrage, punkteAusUrteilen } from '../../lernen/korrektur';
 import { korrigiere } from '../ki';
 import { useStand } from '../kontext';
-import { AbgabeKnopf, type TeilProps } from './einfach';
+import { type Abgabe, AbgabeKnopf, type TeilProps } from './einfach';
 
 type Urteil = 'ja' | 'teil' | 'nein';
-type Phase = 'schreiben' | 'ki-laeuft' | 'ki-ergebnis' | 'selbst';
 
 const KI_ZEICHEN: Record<KiUrteil, { zeichen: string; name: string; klasse: string }> = {
   erfuellt: { zeichen: '✓', name: 'steht da', klasse: 'ja' },
@@ -14,116 +14,80 @@ const KI_ZEICHEN: Record<KiUrteil, { zeichen: string; name: string; klasse: stri
   nicht: { zeichen: '✗', name: 'fehlt', klasse: 'nein' },
 };
 
+interface VergleichProps {
+  aufgabe: Aufgabe;
+  erwartung: Erwartungshorizont;
+  /** Die Antwort als Text – so geht sie an die KI. */
+  antwort: string;
+  /** Wie die Antwort angezeigt wird (z.B. als Klassendiagramm); sonst als Text. */
+  antwortAnsicht?: ReactNode;
+  mitKi: boolean;
+  fertig: boolean;
+  onAbgabe: (a: Abgabe) => void;
+}
+
 /**
- * Freitext: erst schreiben, dann bewerten. Mit eingerichtetem Schlüssel bewertet die KI
- * jedes Kriterium des Erwartungshorizonts; sonst (oder bei einem Fehler) schätzt man sich selbst ein.
- * Die Punkte berechnet immer die App aus den Einzelurteilen.
+ * Bewertung nach Erwartungshorizont: Mit KI wird jedes Kriterium von der KI beurteilt;
+ * ohne KI (oder bei einem Fehler) schätzt man sich selbst ein. Die Punkte rechnet immer die App aus.
  */
-export function Freitext({ aufgabe, fertig, onAbgabe, onEntwurf }: TeilProps<'freitext'>) {
-  const { stand, aendere, ki } = useStand();
-  const [text, setText] = useState(stand.antworten[aufgabe.id] ?? '');
-  const [phase, setPhase] = useState<Phase>('schreiben');
+export function ErwartungsVergleich({ aufgabe, erwartung, antwort, antwortAnsicht, mitKi, fertig, onAbgabe }: VergleichProps) {
+  const { stand } = useStand();
+  const [phase, setPhase] = useState<'ki-laeuft' | 'ki-ergebnis' | 'selbst'>(mitKi ? 'ki-laeuft' : 'selbst');
   const [urteile, setUrteile] = useState<Readonly<Record<string, Urteil>>>({});
   const [korrektur, setKorrektur] = useState<KorrekturErgebnis | null>(null);
   const [fehler, setFehler] = useState<string | null>(null);
   const [musterOffen, setMusterOffen] = useState(false);
-  const kriterien = aufgabe.erwartung.kriterien;
-  const woerter = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+  const kriterien = erwartung.kriterien;
 
-  // Ein früher gespeicherter Entwurf steht schon im Feld; der Tutor soll ihn ebenfalls kennen.
   useEffect(() => {
-    onEntwurf?.(text);
-    // Nur beim ersten Anzeigen nötig, danach meldet onChange jede Änderung.
+    if (!mitKi) return;
+    let aktiv = true;
+    korrigiere(baueKorrekturAnfrage(aufgabe, erwartung, antwort, stand))
+      .then((ergebnis) => {
+        if (!aktiv) return;
+        setKorrektur(ergebnis);
+        setPhase('ki-ergebnis');
+        onAbgabe({ punkte: punkteAusUrteilen(erwartung, ergebnis.kriterien), max: aufgabe.punkte, quelle: 'ki' });
+      })
+      .catch((e: unknown) => {
+        if (!aktiv) return;
+        setFehler(e instanceof Error ? e.message : 'Die KI-Korrektur ist fehlgeschlagen.');
+        setPhase('selbst');
+      });
+    return () => {
+      aktiv = false;
+    };
+    // Die Korrektur läuft genau einmal, wenn die Antwort abgegeben wurde.
   }, []);
 
-  const merke =() => aendere((s) => ({ ...s, antworten: { ...s.antworten, [aufgabe.id]: text } }));
-
-  const selbstPruefen = () => {
-    merke();
-    setPhase('selbst');
-  };
-
-  const kiPruefen = async () => {
-    merke();
-    setFehler(null);
-    setPhase('ki-laeuft');
-    try {
-      const ergebnis = await korrigiere(baueKorrekturAnfrage(aufgabe, aufgabe.erwartung, text, stand));
-      setKorrektur(ergebnis);
-      setPhase('ki-ergebnis');
-      onAbgabe({ punkte: punkteAusUrteilen(aufgabe.erwartung, ergebnis.kriterien), max: aufgabe.punkte, quelle: 'ki' });
-    } catch (e) {
-      setFehler(e instanceof Error ? e.message : 'Die KI-Korrektur ist fehlgeschlagen.');
-      setPhase('selbst');
-    }
-  };
-
-  const speichereSelbst = () => {
-    const punkte = kriterien.reduce((summe, k) => summe + (urteile[k.id] === 'ja' ? k.punkte : urteile[k.id] === 'teil' ? k.punkte / 2 : 0), 0);
-    onAbgabe({ punkte, max: aufgabe.punkte, quelle: 'selbst' });
-  };
-
-  if (phase === 'schreiben') {
-    return (
-      <div>
-        <textarea
-          className="freitext"
-          rows={aufgabe.zeilen ?? 6}
-          value={text}
-          onChange={(e) => {
-            setText(e.target.value);
-            onEntwurf?.(e.target.value);
-          }}
-          placeholder="Schreibe deine Antwort in ganzen Sätzen – so, wie du sie in der Klausur aufs Papier bringen würdest."
-          spellCheck
-          lang="de"
-        />
-        <p className="hilfstext">
-          {woerter} {woerter === 1 ? 'Wort' : 'Wörter'} · {aufgabe.punkte} Punkte: Für jeden Punkt wird ein eigener Gedanke erwartet.
-        </p>
-        {ki.verfuegbar ? (
-          <div className="abgabe-leiste knopfreihe">
-            <button className="knopf primaer" disabled={woerter < 3} onClick={kiPruefen}>
-              Abgeben und korrigieren lassen
-            </button>
-            <button className="textknopf" disabled={woerter < 3} onClick={selbstPruefen}>
-              lieber selbst mit dem Erwartungshorizont vergleichen
-            </button>
-          </div>
-        ) : (
-          <AbgabeKnopf aktiv={woerter >= 3} onClick={selbstPruefen} text="Abgeben und vergleichen" />
-        )}
-      </div>
-    );
-  }
-
-  if (phase === 'ki-laeuft') {
-    return (
-      <div className="ki-wartet" role="status">
-        <span className="kreisel" aria-hidden="true" />
-        Deine Antwort wird korrigiert … das dauert einige Sekunden.
-        <p className="eigene-antwort">{text}</p>
-      </div>
-    );
-  }
-
-  const fachbegriffe = aufgabe.erwartung.fachbegriffe && (
+  const eigene = antwortAnsicht ?? <p className="eigene-antwort">{antwort}</p>;
+  const fachbegriffe = erwartung.fachbegriffe && (
     <p className="fachbegriffe">
       <strong>Fachbegriffe, die vorkommen sollten:</strong>{' '}
-      {aufgabe.erwartung.fachbegriffe.map((f) => (
-        <span key={f} className={`fachbegriff${text.toLowerCase().includes(f.toLowerCase()) ? ' drin' : ''}`}>
+      {erwartung.fachbegriffe.map((f) => (
+        <span key={f} className={`fachbegriff${antwort.toLowerCase().includes(f.toLowerCase()) ? ' drin' : ''}`}>
           {f}
         </span>
       ))}
     </p>
   );
 
+  if (phase === 'ki-laeuft') {
+    return (
+      <div className="ki-wartet" role="status">
+        <span className="kreisel" aria-hidden="true" />
+        Deine Antwort wird korrigiert … das dauert einige Sekunden.
+        {eigene}
+      </div>
+    );
+  }
+
   if (phase === 'ki-ergebnis' && korrektur) {
     const nachId = new Map(korrektur.kriterien.map((k) => [k.id, k]));
     return (
       <div className="freitext-pruefung">
         <h4>Deine Antwort</h4>
-        <p className="eigene-antwort">{text}</p>
+        {eigene}
         <h4>Korrektur nach Erwartungshorizont</h4>
         <ul className="kriterien ki">
           {kriterien.map((k) => {
@@ -172,11 +136,16 @@ export function Freitext({ aufgabe, fertig, onAbgabe, onEntwurf }: TeilProps<'fr
         <button className="textknopf" onClick={() => setMusterOffen(!musterOffen)} aria-expanded={musterOffen}>
           {musterOffen ? 'Musterantwort ausblenden' : 'Musterantwort zeigen'}
         </button>
-        {musterOffen && <p className="musterantwort">{aufgabe.erwartung.musterantwort}</p>}
+        {musterOffen && <p className="musterantwort">{erwartung.musterantwort}</p>}
         <p className="leise-text ki-vermerk">Einschätzung der KI ({korrektur.modell}) – in der Klausur entscheidet deine Lehrkraft.</p>
       </div>
     );
   }
+
+  const speichereSelbst = () => {
+    const punkte = kriterien.reduce((summe, k) => summe + (urteile[k.id] === 'ja' ? k.punkte : urteile[k.id] === 'teil' ? k.punkte / 2 : 0), 0);
+    onAbgabe({ punkte, max: aufgabe.punkte, quelle: 'selbst' });
+  };
 
   return (
     <div className="freitext-pruefung">
@@ -188,11 +157,11 @@ export function Freitext({ aufgabe, fertig, onAbgabe, onEntwurf }: TeilProps<'fr
       <div className="spalten">
         <section>
           <h4>Deine Antwort</h4>
-          <p className="eigene-antwort">{text}</p>
+          {eigene}
         </section>
         <section>
           <h4>Musterantwort</h4>
-          <p className="musterantwort">{aufgabe.erwartung.musterantwort}</p>
+          <p className="musterantwort">{erwartung.musterantwort}</p>
         </section>
       </div>
       <h4>Erwartungshorizont – was steht in deiner Antwort?</h4>
@@ -227,6 +196,63 @@ export function Freitext({ aufgabe, fertig, onAbgabe, onEntwurf }: TeilProps<'fr
       </ul>
       {fachbegriffe}
       {!fertig && <AbgabeKnopf aktiv={kriterien.every((k) => urteile[k.id])} onClick={speichereSelbst} text="Einschätzung speichern" />}
+    </div>
+  );
+}
+
+/** Freitext: erst schreiben, dann nach Erwartungshorizont bewerten (mit KI oder selbst). */
+export function Freitext({ aufgabe, fertig, onAbgabe, onEntwurf }: TeilProps<'freitext'>) {
+  const { stand, aendere, ki } = useStand();
+  const [text, setText] = useState(stand.antworten[aufgabe.id] ?? '');
+  const [abgegeben, setAbgegeben] = useState<null | { mitKi: boolean }>(null);
+  const woerter = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+
+  // Ein früher gespeicherter Entwurf steht schon im Feld; der Tutor soll ihn ebenfalls kennen.
+  useEffect(() => {
+    onEntwurf?.(text);
+  }, []);
+
+  const abgeben = (mitKi: boolean) => {
+    aendere((s) => ({ ...s, antworten: { ...s.antworten, [aufgabe.id]: text } }));
+    setAbgegeben({ mitKi });
+  };
+
+  if (abgegeben) {
+    return <ErwartungsVergleich aufgabe={aufgabe} erwartung={aufgabe.erwartung} antwort={text} mitKi={abgegeben.mitKi} fertig={fertig} onAbgabe={onAbgabe} />;
+  }
+
+  return (
+    <div>
+      <textarea
+        className="freitext"
+        rows={aufgabe.zeilen ?? 6}
+        value={text}
+        onChange={(e) => {
+          setText(e.target.value);
+          onEntwurf?.(e.target.value);
+        }}
+        placeholder="Schreibe deine Antwort in ganzen Sätzen – so, wie du sie in der Klausur aufs Papier bringen würdest."
+        spellCheck
+        lang="de"
+      />
+      <p className="hilfstext">
+        {woerter} {woerter === 1 ? 'Wort' : 'Wörter'} · {aufgabe.punkte} Punkte: Für jeden Punkt wird ein eigener Gedanke erwartet.
+      </p>
+      <AbgabeLeiste aktiv={woerter >= 3} mitKi={ki.verfuegbar} onAbgabe={abgeben} />
+    </div>
+  );
+}
+
+export function AbgabeLeiste({ aktiv, mitKi, onAbgabe }: { aktiv: boolean; mitKi: boolean; onAbgabe: (mitKi: boolean) => void }) {
+  if (!mitKi) return <AbgabeKnopf aktiv={aktiv} onClick={() => onAbgabe(false)} text="Abgeben und vergleichen" />;
+  return (
+    <div className="abgabe-leiste knopfreihe">
+      <button className="knopf primaer" disabled={!aktiv} onClick={() => onAbgabe(true)}>
+        Abgeben und korrigieren lassen
+      </button>
+      <button className="textknopf" disabled={!aktiv} onClick={() => onAbgabe(false)}>
+        lieber selbst mit dem Erwartungshorizont vergleichen
+      </button>
     </div>
   );
 }

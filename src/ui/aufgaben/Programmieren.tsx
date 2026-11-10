@@ -187,7 +187,14 @@ function TestAblauf({ bewertung, index, aufgabe }: { bewertung: ProgrammBewertun
         Soll am Ende: Feld ({t.soll.x}|{t.soll.y}), Blick nach {richtungsName(t.soll.richtung)}, {t.soll.gefressen} Fliege{t.soll.gefressen === 1 ? '' : 'n'}{' '}
         gefressen.
       </p>
-      <Stepper key={`${index}-ist`} programm={bewertung.programm} lauf={aufgezeichnet} start={t.start} titel={`Dein Programm in „${t.test.name}“`} />
+      <Stepper
+        key={`${index}-ist`}
+        programm={bewertung.programm}
+        lauf={aufgezeichnet}
+        start={t.start}
+        titel={`Dein Programm in „${t.test.name}“`}
+        struktogramm={aufgabe.struktogrammZeigen ? { methode: aufgabe.methode, mitHilfsmethoden: true } : undefined}
+      />
       <button className="textknopf" onClick={() => setZeigeSoll(!zeigeSoll)}>
         {zeigeSoll ? 'Musterlösung in dieser Welt ausblenden' : 'Zum Vergleich: Musterlösung in dieser Welt'}
       </button>

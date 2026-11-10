@@ -1,6 +1,8 @@
 // Bereitet Freitext-Aufgaben für den KI-Korrektor auf und rechnet dessen Urteile in Punkte um.
 import type { KorrekturAnfrage, KorrekturErgebnis, Urteil } from '../../server/ki/typen';
 import { attributText, methodeText } from '../engine/klassen';
+import { struktogrammAlsText, struktogrammeMitHilfsmethoden } from '../engine/strukto';
+import { uebersetze } from './ausfuehren';
 import { LEKTIONEN, operator } from '../inhalte';
 import type { Merksatz } from '../inhalte';
 import type { Aufgabe, Erwartungshorizont, Material } from '../inhalte/typen';
@@ -15,6 +17,10 @@ export function materialAlsText(material: Material[] | undefined): string | unde
           return `Quelltext${m.titel ? ` (${m.titel})` : ''}:\n${m.quelltext}`;
         case 'text':
           return m.markdown;
+        case 'struktogramm': {
+          const p = uebersetze(m.quelltext).programm;
+          return p ? struktogrammeMitHilfsmethoden(p, m.methode).map(struktogrammAlsText).join('\n') : '';
+        }
         case 'welt':
           return `Welt${m.titel ? ` (${m.titel})` : ''} als Karte (# Hindernis, . leer, K Klatsche, F Fliege, > v < ^ Tarantel mit Blickrichtung):\n${m.welt.karte.trim()}`;
         case 'objekte':

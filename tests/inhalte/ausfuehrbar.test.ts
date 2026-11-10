@@ -93,3 +93,19 @@ describe('Zeilen ordnen', () => {
     });
   }
 });
+
+import { checkliste, struktogrammeMitHilfsmethoden } from '../../src/engine/strukto';
+
+describe('Struktogramm zeichnen', () => {
+  for (const a of AUFGABEN) {
+    if (a.typ !== 'struktogramm-zeichnen') continue;
+    it(a.id, () => {
+      const { programm, diagnosen } = uebersetze(a.musterloesung);
+      expect(diagnosen.filter((d) => d.schwere !== 'stil')).toEqual([]);
+      expect(pruefeEinrueckung(a.musterloesung)).toEqual([]);
+      const bilder = struktogrammeMitHilfsmethoden(programm!, a.methode);
+      expect(bilder[0].bloecke.length).toBeGreaterThan(0);
+      expect(checkliste(bilder[0]).length).toBeGreaterThan(1);
+    });
+  }
+});

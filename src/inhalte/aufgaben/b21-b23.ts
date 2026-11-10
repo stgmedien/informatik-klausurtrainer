@@ -188,7 +188,7 @@ export const AUFGABEN_B21_B23: Aufgabe[] = [
     id: 'b21-einrueckung-fehler',
     typ: 'auswahl',
     mehrfach: false,
-    kann: ['k21-einruecken'],
+    kann: ['k21-einruecken', 'k25-einruecken'],
     titel: 'Einrückungsfehler finden',
     minuten: 2,
     punkte: 1,

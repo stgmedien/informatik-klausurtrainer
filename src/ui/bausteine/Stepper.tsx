@@ -4,6 +4,7 @@ import type { Welt } from '../../engine/welt';
 import { beschreibeSchritt, endeText, zeigeJavaWert } from '../../lernen/ausfuehren';
 import { Inline } from '../Markdown';
 import { CodeAnsicht } from './MaterialAnsicht';
+import { StruktogrammAnsicht } from './StruktogrammAnsicht';
 import { WeltAnsicht } from './WeltAnsicht';
 
 interface Props {
@@ -14,13 +15,15 @@ interface Props {
   autoStart?: boolean;
   markiert?: { x: number; y: number } | null;
   titel?: string;
+  /** Zeigt zusätzlich das Struktogramm dieser Methode; der gerade ausgeführte Block leuchtet mit. */
+  struktogramm?: { methode: string; mitHilfsmethoden?: boolean };
 }
 
 /**
  * Spielt einen aufgezeichneten Programmlauf ab: vor, zurück, automatisch.
  * Position 0 ist die Ausgangslage, Position k der Zustand nach dem k-ten Schritt.
  */
-export function Stepper({ programm, lauf, start, autoStart, markiert, titel }: Props) {
+export function Stepper({ programm, lauf, start, autoStart, markiert, titel, struktogramm }: Props) {
   const n = lauf.schritte.length;
   const [pos, setPos] = useState(0);
   const [laeuft, setLaeuft] = useState(Boolean(autoStart));
@@ -74,6 +77,16 @@ export function Stepper({ programm, lauf, start, autoStart, markiert, titel }: P
           <div className="konsole" aria-label="Konsole" aria-live="polite">
             {konsole.length === 0 ? <span className="leise-text">Konsole: keine Meldung</span> : konsole.map((z, i) => <div key={i}>{z}</div>)}
           </div>
+          {struktogramm && (
+            <div className="stepper-strukto">
+              <StruktogrammAnsicht
+                programm={programm}
+                methode={struktogramm.methode}
+                mitHilfsmethoden={struktogramm.mitHilfsmethoden}
+                aktiverKnoten={schritt && !amEnde && 'knoten' in schritt.ereignis ? schritt.ereignis.knoten : undefined}
+              />
+            </div>
+          )}
         </div>
         <div className="stepper-code">
           <CodeAnsicht quelltext={programm.quelltext} markierteZeile={schritt && !amEnde ? schritt.zeile : undefined} />

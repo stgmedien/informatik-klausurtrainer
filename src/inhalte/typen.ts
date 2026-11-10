@@ -61,6 +61,8 @@ export type StrukturMerkmal = 'while' | 'do-while' | 'for' | 'if' | 'if-else' | 
 export type Material =
   | { art: 'klassendiagramm'; modell: KlassenModell; titel?: string }
   | { art: 'welt'; welt: WeltAngabe; titel?: string }
+  /** Struktogramm, erzeugt aus dem Quelltext (nur Methoden). */
+  | { art: 'struktogramm'; quelltext: string; methode: string; mitHilfsmethoden?: boolean; titel?: string }
   | { art: 'objekte'; objekte: ObjektKarte[]; titel?: string }
   | { art: 'code'; quelltext: string; titel?: string }
   | { art: 'text'; markdown: string };
@@ -137,6 +139,21 @@ export type Aufgabe = AufgabeBasis &
         struktur?: { muss?: StrukturMerkmal[]; verboten?: StrukturMerkmal[] };
         /** Statt einer Beschreibung wird das Struktogramm der Musterlösung als Vorlage gezeigt. */
         struktogrammZeigen?: boolean;
+      }
+    | {
+        typ: 'struktogramm-zeichnen';
+        /** Lösung als Quelltext; daraus entstehen Muster-Struktogramm und Checkliste. */
+        musterloesung: string;
+        methode: string;
+        /** true: Der Quelltext wird gezeigt und soll überführt werden. false: modellieren nach Beschreibung. */
+        codeZeigen: boolean;
+        mitHilfsmethoden?: boolean;
+      }
+    | {
+        typ: 'klassen-modellieren';
+        erwartung: Erwartungshorizont;
+        /** Klassen, die im Modell vorkommen müssen (für die automatische Vorprüfung). */
+        pflichtklassen: string[];
       }
     | {
         typ: 'zeilen-ordnen';

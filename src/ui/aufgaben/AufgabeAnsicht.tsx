@@ -9,6 +9,7 @@ import { punkteText } from '../hilfen';
 import { frageTutor } from '../ki';
 import { useStand } from '../kontext';
 import { Freitext } from './Freitext';
+import { KlassenModellieren, StruktogrammZeichnen } from './Modellieren';
 import { Programmieren } from './Programmieren';
 import { ZeilenOrdnen } from './ZeilenOrdnen';
 import { Vorhersage } from './Vorhersage';
@@ -49,6 +50,10 @@ function Koerper({ aufgabe, durchgang, fertig, onAbgabe, onEntwurf }: KoerperPro
       return <Programmieren aufgabe={aufgabe} {...gemeinsam} />;
     case 'zeilen-ordnen':
       return <ZeilenOrdnen aufgabe={aufgabe} {...gemeinsam} />;
+    case 'struktogramm-zeichnen':
+      return <StruktogrammZeichnen aufgabe={aufgabe} {...gemeinsam} />;
+    case 'klassen-modellieren':
+      return <KlassenModellieren aufgabe={aufgabe} {...gemeinsam} />;
   }
 }
 

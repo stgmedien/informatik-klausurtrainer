@@ -1,7 +1,8 @@
 import type { Material, ObjektKarte } from '../../inhalte/typen';
-import { baueWelt } from '../../lernen/ausfuehren';
+import { baueWelt, uebersetze } from '../../lernen/ausfuehren';
 import { Markdown } from '../Markdown';
 import { KlassenDiagramm } from './KlassenDiagramm';
+import { StruktogrammAnsicht } from './StruktogrammAnsicht';
 import { WeltAnsicht } from './WeltAnsicht';
 
 export function CodeAnsicht({ quelltext, titel, markierteZeile }: { quelltext: string; titel?: string; markierteZeile?: number }) {
@@ -68,6 +69,19 @@ export function MaterialAnsicht({ material }: { material: Material }) {
           <WeltAnsicht welt={baueWelt(material.welt)} />
         </figure>
       );
+    case 'struktogramm': {
+      const programm = uebersetze(material.quelltext).programm;
+      return (
+        <figure className="material">
+          {material.titel && <figcaption>{material.titel}</figcaption>}
+          {programm ? (
+            <StruktogrammAnsicht programm={programm} methode={material.methode} mitHilfsmethoden={material.mitHilfsmethoden} />
+          ) : (
+            <p className="meldung falsch">Das Struktogramm kann nicht erzeugt werden.</p>
+          )}
+        </figure>
+      );
+    }
     case 'code':
       return <CodeAnsicht quelltext={material.quelltext} titel={material.titel} />;
     case 'text':

@@ -238,3 +238,34 @@ export function checkliste(s: Struktogramm): string[] {
   lauf(s.bloecke, 'ganz oben');
   return liste;
 }
+
+/** Struktogramm als eingerückte Textgliederung (für die KI-Korrektur). */
+export function struktogrammAlsText(s: Struktogramm): string {
+  const zeilen: string[] = [`Struktogramm ${s.titel}:`];
+  const lauf = (bloecke: SBlock[], tiefe: number) => {
+    const e = '  '.repeat(tiefe);
+    if (bloecke.length === 0) zeilen.push(`${e}(leer)`);
+    for (const b of bloecke) {
+      if (b.art === 'anweisung') zeilen.push(`${e}Anweisung: ${b.text}`);
+      else if (b.art === 'aufruf') zeilen.push(`${e}Aufruf: ${b.text}`);
+      else if (b.art === 'kopf') {
+        zeilen.push(`${e}Kopfgesteuerte Schleife, Bedingung: ${b.bedingung}`);
+        lauf(b.rumpf, tiefe + 1);
+      } else if (b.art === 'fuss') {
+        zeilen.push(`${e}Fußgesteuerte Schleife (Rumpf, dann Bedingung: ${b.bedingung})`);
+        lauf(b.rumpf, tiefe + 1);
+      } else if (b.art === 'zaehl') {
+        zeilen.push(`${e}Zählschleife: ${b.kopf}`);
+        lauf(b.rumpf, tiefe + 1);
+      } else {
+        zeilen.push(`${e}Verzweigung, Bedingung: ${b.bedingung}`);
+        zeilen.push(`${e}  Wahr:`);
+        lauf(b.dann, tiefe + 2);
+        zeilen.push(`${e}  Falsch:`);
+        lauf(b.sonst, tiefe + 2);
+      }
+    }
+  };
+  lauf(s.bloecke, 1);
+  return zeilen.join('\n');
+}
