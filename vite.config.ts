@@ -22,11 +22,21 @@ function apiPlugin(): Plugin {
   };
 }
 
+const AUS_DATEI = 'SPINNEN_TRAINER_ENV_AUS_DATEI';
+
 export default defineConfig(({ mode }) => {
+  // Ändert sich .env.local, startet Vite im selben Prozess neu. Werte, die beim letzten Start
+  // aus der Datei kamen, werden deshalb erst entfernt – sonst bliebe ein alter Schlüssel aktiv.
+  for (const name of (process.env[AUS_DATEI] ?? '').split(',').filter(Boolean)) delete process.env[name];
   const env = loadEnv(mode, process.cwd(), '');
+  const gesetzt: string[] = [];
   for (const name of ['ANTHROPIC_API_KEY', 'KI_MODELL'] as const) {
-    if (env[name] && !process.env[name]) process.env[name] = env[name];
+    if (env[name] && !process.env[name]) {
+      process.env[name] = env[name];
+      gesetzt.push(name);
+    }
   }
+  process.env[AUS_DATEI] = gesetzt.join(',');
   return {
     plugins: [react(), apiPlugin()],
     server: { host: '127.0.0.1', port: 5199, strictPort: true },
