@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { KiFehler, frage, modell } from './klient';
-import { SYSTEM_DIAGNOSE, SYSTEM_KORREKTUR, SYSTEM_TUTOR, nachrichtDiagnose, nachrichtKorrektur, nachrichtTutor } from './prompts';
-import type { DiagnoseErgebnis, KorrekturErgebnis, TutorErgebnis } from './typen';
+import { KiFehler, frage, modell } from './klient.js';
+import { SYSTEM_DIAGNOSE, SYSTEM_KORREKTUR, SYSTEM_TUTOR, nachrichtDiagnose, nachrichtKorrektur, nachrichtTutor } from './prompts.js';
+import type { DiagnoseErgebnis, KorrekturErgebnis, TutorErgebnis } from './typen.js';
 
 const OperatorSchema = z.object({ name: z.string(), definition: z.string(), erwartet: z.string() });
 

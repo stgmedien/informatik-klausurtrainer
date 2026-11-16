@@ -2167,3 +2167,22 @@ figcaption {
     break-after: avoid;
   }
 }
+
+/* ---------- Einstellungen: Zugangscode und Import ---------- */
+.code-feld {
+  font: inherit;
+  padding: 7px 10px;
+  border: 1px solid var(--linie-stark);
+  border-radius: 8px;
+  min-width: 14em;
+}
+.datei-knopf {
+  position: relative;
+  cursor: pointer;
+}
+.datei-knopf input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}

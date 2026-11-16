@@ -7,6 +7,9 @@ const ORDNER = path.resolve(process.cwd(), process.env.SPINNEN_DATEN || 'daten')
 const DATEI = path.join(ORDNER, 'lernstand.json');
 const BACKUPS = path.join(ORDNER, 'backup');
 
+/** Online (Vercel) gibt es kein dauerhaftes Dateisystem: Dort speichert der Browser den Lernstand. */
+export const STAND_IM_BROWSER = Boolean(process.env.VERCEL);
+
 export async function leseStand(): Promise<unknown | null> {
   try {
     return JSON.parse(await fs.readFile(DATEI, 'utf8'));

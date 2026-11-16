@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { LEKTIONEN, OPERATOREN } from '../../inhalte';
 import type { Merksatz } from '../../inhalte';
-import { neuerStand } from '../../lernen/stand';
+import { ergaenzeStand, neuerStand } from '../../lernen/stand';
 import { MerksatzKasten } from '../LektionAnsicht';
 import { useStand } from '../kontext';
 
@@ -59,8 +59,23 @@ export function Spickzettel() {
 }
 
 export function Einstellungen() {
-  const { stand, aendere, ki } = useStand();
+  const { stand, aendere, ki, speicherOrt, setzeZugangscode } = useStand();
   const [sicher, setSicher] = useState(false);
+  const [code, setCode] = useState('');
+  const [importMeldung, setImportMeldung] = useState<string | null>(null);
+
+  const importiere = async (datei: File | undefined) => {
+    if (!datei) return;
+    try {
+      const roh = JSON.parse(await datei.text()) as unknown;
+      if (!roh || typeof roh !== 'object' || !Array.isArray((roh as { versuche?: unknown }).versuche)) throw new Error('kein Lernstand');
+      const neu = ergaenzeStand(roh);
+      aendere(() => neu);
+      setImportMeldung(`Übernommen: ${neu.versuche.length} bearbeitete Aufgaben.`);
+    } catch {
+      setImportMeldung('Diese Datei ist kein Lernstand des Spinnen-Trainers.');
+    }
+  };
 
   const exportiere = () => {
     const blob = new Blob([JSON.stringify(stand, null, 2)], { type: 'application/json' });
@@ -106,11 +121,53 @@ export function Einstellungen() {
       </section>
       <section className="karte">
         <h3>KI-Unterstützung</h3>
-        {ki.verfuegbar ? (
+        {ki.eingerichtet && ki.codeNoetig && (
+          <div className="zugangscode">
+            <p>
+              {ki.verfuegbar ? (
+                <>
+                  <span className="marke grad-3">aktiv</span> Ein Zugangscode ist in diesem Browser gespeichert.
+                </>
+              ) : (
+                <>
+                  <span className="marke grad-1">Zugangscode nötig</span> In der Online-Version ist die KI nur mit Zugangscode nutzbar, damit nicht jeder
+                  mit dem Link den API-Schlüssel verbraucht.
+                </>
+              )}
+            </p>
+            <div className="knopfreihe">
+              <input
+                className="code-feld"
+                type="password"
+                autoComplete="off"
+                placeholder="Zugangscode"
+                aria-label="Zugangscode für die KI"
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+              />
+              <button
+                className="knopf"
+                disabled={!code.trim()}
+                onClick={() => {
+                  setzeZugangscode(code);
+                  setCode('');
+                }}
+              >
+                Speichern
+              </button>
+              {ki.verfuegbar && (
+                <button className="knopf leise" onClick={() => setzeZugangscode('')}>
+                  Code entfernen
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+        {ki.verfuegbar && !ki.codeNoetig ? (
           <p>
             <span className="marke grad-3">aktiv</span> Der Schlüssel ist eingerichtet (Modell: <code>{ki.modell}</code>).
           </p>
-        ) : (
+        ) : ki.eingerichtet ? null : (
           <>
             <p>
               <span className="marke grad-1">nicht eingerichtet</span> Die App funktioniert auch ohne KI: Freitext-Antworten prüfst du dann selbst
@@ -125,14 +182,25 @@ export function Einstellungen() {
       </section>
       <section className="karte">
         <h3>Lernstand</h3>
-        <p>
-          Dein Lernstand liegt in der Datei <code>daten/lernstand.json</code> im Projektordner (mit täglicher Sicherungskopie in <code>daten/backup</code>
-          ). Bisher {stand.versuche.length} bearbeitete Aufgaben.
-        </p>
+        {speicherOrt === 'datei' ? (
+          <p>
+            Dein Lernstand liegt in der Datei <code>daten/lernstand.json</code> im Projektordner (mit täglicher Sicherungskopie in <code>daten/backup</code>
+            ). Bisher {stand.versuche.length} bearbeitete Aufgaben.
+          </p>
+        ) : (
+          <p>
+            Dein Lernstand wird <strong>nur in diesem Browser</strong> gespeichert. Bisher {stand.versuche.length} bearbeitete Aufgaben. Um auf einem
+            anderen Gerät weiterzulernen, lade ihn hier herunter und dort wieder hoch.
+          </p>
+        )}
         <div className="knopfreihe">
           <button className="knopf" onClick={exportiere}>
             Als Datei herunterladen
           </button>
+          <label className="knopf leise datei-knopf">
+            Aus Datei übernehmen …
+            <input type="file" accept="application/json,.json" onChange={(e) => void importiere(e.target.files?.[0])} />
+          </label>
           {!sicher ? (
             <button className="knopf leise" onClick={() => setSicher(true)}>
               Lernstand zurücksetzen …
@@ -154,6 +222,7 @@ export function Einstellungen() {
             </>
           )}
         </div>
+        {importMeldung && <p className="hilfstext">{importMeldung}</p>}
       </section>
     </div>
   );

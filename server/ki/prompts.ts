@@ -1,4 +1,4 @@
-import type { DiagnoseAnfrage, KorrekturAnfrage, TutorAnfrage } from './typen';
+import type { DiagnoseAnfrage, KorrekturAnfrage, TutorAnfrage } from './typen.js';
 
 // Die Systemtexte enthalten nichts Veränderliches (kein Datum, keine Aufgabe),
 // damit sie bei jeder Anfrage bytegleich sind.

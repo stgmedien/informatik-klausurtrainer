@@ -5,3 +5,4 @@ dist/
 .env.*.local
 daten/
 .DS_Store
+.vercel/
